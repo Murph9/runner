@@ -1,0 +1,78 @@
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'application'
+
+mainClassName = 'runner.base.Main'
+
+repositories {
+	jcenter()
+	maven { url "https://dl.bintray.com/jmonkeyengine/org.jmonkeyengine" }
+}
+
+project(":assets") {
+    apply plugin: "java"
+    
+    buildDir = rootProject.file("build/assets")
+    
+    sourceSets {
+        main {
+            resources {
+                srcDir '.'
+                include '**'
+                exclude '**/*.blend'
+                exclude '**/*.ps1'
+                exclude '**/*.py'
+                exclude '**/*.blend1'
+                exclude 'bin/*'
+            }
+        }
+    }
+}
+
+task createFatJar(type: Jar) {
+    archiveBaseName = 'outJar'
+
+    manifest {
+        attributes 'Main-Class': "${mainClassName}"
+    }
+
+    from sourceSets.main.output
+    dependsOn configurations.compileClasspath
+
+    from {
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
+    }
+
+    dependsOn 'build'
+}
+
+test {
+    // Use junit platform for unit tests
+    useJUnitPlatform()
+}
+
+application {
+    // Define the main class for the application
+    mainClassName = "${mainClassName}"
+}
+
+def jme3Version = '3.3.2-stable'
+def jupiterVersion = '5.5.1'
+dependencies {
+	implementation "org.jmonkeyengine:jme3-core:${jme3Version}"
+	implementation "org.jmonkeyengine:jme3-desktop:${jme3Version}"
+	implementation "org.jmonkeyengine:jme3-lwjgl:${jme3Version}"
+	
+    implementation "org.yaml:snakeyaml:1.25"
+    implementation "com.simsilica:lemur:1.13.0"
+
+    implementation "com.simsilica:zay-es:1.2.1"
+    implementation "com.simsilica:zay-es-net:1.2.1"
+
+    // Use JUnit Jupiter API for testing
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${jupiterVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:${jupiterVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${jupiterVersion}"
+
+	runtimeOnly project(':assets')
+}
