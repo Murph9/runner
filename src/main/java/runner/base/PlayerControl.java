@@ -10,14 +10,18 @@ import com.jme3.scene.control.AbstractControl;
 
 public class PlayerControl extends AbstractControl {
 
+    // TODO action startPos.toString() hack is really bad
+
+    private final String id;
     private final Vector3f startPos;
     private int pos;
 
     public PlayerControl(Application app, Vector3f startPos, int keyRight, int keyLeft) {
         this.startPos = startPos;
-        app.getInputManager().addMapping("Left", new KeyTrigger(keyRight));
-        app.getInputManager().addMapping("Right", new KeyTrigger(keyLeft));
-        app.getInputManager().addListener(listener, "Left", "Right");
+        this.id = startPos.toString();
+        app.getInputManager().addMapping(this.id + "Left", new KeyTrigger(keyRight));
+        app.getInputManager().addMapping(this.id + "Right", new KeyTrigger(keyLeft));
+        app.getInputManager().addListener(listener, this.id + "Left", this.id + "Right");
     }
 
     @Override
@@ -33,10 +37,10 @@ public class PlayerControl extends AbstractControl {
     private final ActionListener listener = new ActionListener() {
         @Override
         public void onAction(String name, boolean keyPressed, float tpf) {
-            if (name.equals("Left") && keyPressed) {
+            if (name.equals(PlayerControl.this.id + "Left") && keyPressed) {
                 pos--;
             }
-            if (name.equals("Right") && keyPressed) {
+            if (name.equals(PlayerControl.this.id + "Right") && keyPressed) {
                 pos++;
             }
 

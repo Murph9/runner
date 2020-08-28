@@ -21,6 +21,7 @@ import runner.helper.H;
 public class Runner extends AbstractAppState {
     
     // Base instance of a runner game
+    private final RunnerManager manager;
     private final Vector3f startPos;
     private final int leftKey;
     private final int rightKey;
@@ -30,7 +31,8 @@ public class Runner extends AbstractAppState {
     private final List<Geometry> objects;
     private Geometry player;
     
-    public Runner(Vector3f startPos, int left, int right) {
+    public Runner(RunnerManager manager, Vector3f startPos, int left, int right) {
+        this.manager = manager;
         this.startPos = startPos;
         this.leftKey = left;
         this.rightKey = right;
@@ -44,15 +46,16 @@ public class Runner extends AbstractAppState {
         
         // floor
         Geometry gFloor = Geo.createBox(app.getAssetManager(), new Vector3f(2f, 30f, 0.1f), new ColorRGBA(0.2f, 0.2f, 0.2f, 0));
+        gFloor.setLocalTranslation(startPos.add(0, 25f, -0.1f));
         rootNode.attachChild(gFloor);
         
         // player
-        Geometry g = Geo.createBox(app.getAssetManager(), new Vector3f(0.4f, 0.4f, 0.1f), new ColorRGBA(1, 1, 1, 0));
-        
+        Geometry g = Geo.createBox(app.getAssetManager(), new Vector3f(0.4f, 0.4f, 0.1f), ColorRGBA.Black);
         player = g.clone();
+        player.setName("player");
+        player.getMaterial().setColor("Color", H.randomColourHSV());
         player.setLocalTranslation(startPos);
         player.addControl(new PlayerControl(app, startPos, leftKey, rightKey));
-
         rootNode.attachChild(player);
 
         for (int i = 0; i < 10; i++) {
@@ -60,9 +63,19 @@ public class Runner extends AbstractAppState {
             g2.setName("box" + i);
             g2.getMaterial().setColor("Color", H.randomColourHSV());
             objects.add(g2);
-            g2.setLocalTranslation(FastMath.nextRandomInt(-1, 1), FastMath.nextRandomInt(2, 15)*2, 0);
+            g2.setLocalTranslation(startPos.add(FastMath.nextRandomInt(-1, 1), FastMath.nextRandomInt(2, 15)*2, 0));
             g2.addControl(new RunnerObjControl(new Vector3f(0, -1, 0)));
             rootNode.attachChild(g2);
+        }
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+
+        player.getControl(PlayerControl.class).setEnabled(enabled);
+        for (Geometry g: this.objects) {
+            g.getControl(RunnerObjControl.class).setEnabled(enabled);
         }
     }
 
@@ -82,6 +95,7 @@ public class Runner extends AbstractAppState {
         for (Geometry g: objects) {
             if (g.collideWith(box, results) > 0) {
                 stopAllThings();
+                manager.gameOver();
             }
         }
     }
