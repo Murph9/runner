@@ -15,6 +15,7 @@ import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
+import com.jme3.scene.Spatial;
 
 import runner.helper.Geo;
 import runner.helper.H;
@@ -27,10 +28,12 @@ public class Runner extends AbstractAppState {
     private final String playerId;
     private final int leftKey;
     private final int rightKey;
+    private final Node rootNode;
 
     private float distance;
 
     private SimpleApplication app;
+    
     private final List<Geometry> objects;
     private Geometry player;
     private Geometry gFloor;
@@ -38,6 +41,7 @@ public class Runner extends AbstractAppState {
     
     public Runner(RunnerManager manager, Vector3f startPos, int left, int right) {
         this.manager = manager;
+        this.rootNode = new Node("root node");
         this.startPos = startPos;
         this.playerId = startPos.toString(); //TODO hack
         this.leftKey = left;
@@ -48,21 +52,23 @@ public class Runner extends AbstractAppState {
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
+        
         this.app = (SimpleApplication)app;
-        Node rootNode = ((SimpleApplication)app).getRootNode();
+        ((SimpleApplication)app).getRootNode().attachChild(rootNode);
+        rootNode.setLocalTranslation(startPos);
         
         // floor
         gFloor = Geo.createBox(app.getAssetManager(), new Vector3f(2f, 30f, 0.1f), new ColorRGBA(0.2f, 0.2f, 0.2f, 0));
-        gFloor.setLocalTranslation(startPos.add(0, 25f, -0.1f));
+        gFloor.setLocalTranslation(0, 25f, -0.1f);
         rootNode.attachChild(gFloor);
         
         // player
         Geometry g = Geo.createBox(app.getAssetManager(), new Vector3f(0.4f, 0.4f, 0.1f), ColorRGBA.Black);
         player = g.clone();
         player.setName("player");
+        player.setLocalTranslation(new Vector3f());
         player.getMaterial().setColor("Color", H.randomColourHSV());
-        player.setLocalTranslation(startPos);
-        player.addControl(new PlayerControl(app, playerId, startPos, leftKey, rightKey));
+        player.addControl(new PlayerControl(app, playerId, new Vector3f(), leftKey, rightKey));
         rootNode.attachChild(player);
 
         app.getInputManager().addMapping(playerId + "Left", new KeyTrigger(leftKey));
@@ -75,7 +81,7 @@ public class Runner extends AbstractAppState {
             g2.setName("box" + i);
             g2.getMaterial().setColor("Color", H.randomColourHSV());
             objects.add(g2);
-            g2.setLocalTranslation(startPos.add(FastMath.nextRandomInt(-1, 1), FastMath.nextRandomInt(2, 15)*2, 0));
+            g2.setLocalTranslation(FastMath.nextRandomInt(-1, 1), FastMath.nextRandomInt(2, 15)*2, 0);
             g2.addControl(new RunnerObjControl(new Vector3f(0, -1, 0)));
             rootNode.attachChild(g2);
         }
@@ -132,7 +138,7 @@ public class Runner extends AbstractAppState {
         player.removeControl(PlayerControl.class);
 
         gFloor.removeFromParent();
-        
+
         for (Geometry g : objects) {
             g.removeFromParent();
             g.removeControl(RunnerObjControl.class);
@@ -140,4 +146,8 @@ public class Runner extends AbstractAppState {
 
         super.cleanup();
     }
+
+	public Spatial getRootNode() {
+		return rootNode;
+	}
 }

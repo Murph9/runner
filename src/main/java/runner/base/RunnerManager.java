@@ -4,8 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.jme3.app.Application;
+import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
+import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.ViewPort;
 
 public class RunnerManager {
     //to handle their viewports
@@ -26,25 +29,57 @@ public class RunnerManager {
     private List<Runner> runners;
 
     public RunnerManager(int count) {
-        this.count = count;
+        this.count = Math.max(1, count);
         runners = new LinkedList<>();
     }
 
-    public void init(Application app) {
+    private Vector3f calcOffsetFor(int i) {
+        return new Vector3f(i*10f, 0, 0); //just far enough that they can't see each other
+    }
+
+    private void reset(Application app) {
         ui = new RunnerUi(this);
         app.getStateManager().attach(ui);
 
-        var cam = app.getCamera();
-        cam.setLocation(new Vector3f(0, -5, 8));
-        cam.lookAt(new Vector3f(0, 4, 0), Vector3f.UNIT_Y);
-
         for (int i = 0; i < count; i++) {
-            Runner r = new Runner(this, new Vector3f(i*3f, 0, 0), KEY_NAMES.get(i * 2).key, KEY_NAMES.get(i * 2 + 1).key);
+            Vector3f offset = calcOffsetFor(i);
+
+            Runner r = new Runner(this, offset, KEY_NAMES.get(i * 2).key, KEY_NAMES.get(i * 2 + 1).key);
             runners.add(r);
             app.getStateManager().attach(r);
 
             ui.addKeyCombo(KEY_NAMES.get(i * 2).text, KEY_NAMES.get(i * 2 + 1).text);
         }
+    }
+
+    public void initOnce(Application app) {
+        // setup viewports
+
+        // do 1 first, as its the default one
+        var offset = calcOffsetFor(0);
+        var cam = app.getCamera();
+        cam.setLocation(offset.add(0, -5, 8));
+        cam.lookAt(offset.add(0, 4, 0), Vector3f.UNIT_Y);
+
+        //then if there is more add more views
+        if (count != 1) {
+            cam.setViewPort(0, 1/(float)count, 0, 1);
+            for (int i = 1; i < count; i++) {
+                offset = calcOffsetFor(i);
+
+                cam = cam.clone();
+                cam.setLocation(offset.add(0, -5, 8));
+                cam.lookAt(offset.add(0, 4, 0), Vector3f.UNIT_Y);
+                cam.setViewPort(1 * i / (float) count, 1*(i+1) / (float) count, 0, 1);
+                ViewPort view_n = app.getRenderManager().createMainView("View of camera "+i, cam);
+                view_n.attachScene(((SimpleApplication)app).getRootNode());
+                view_n.setBackgroundColor(ColorRGBA.Black);
+                view_n.setClearFlags(true, true, true);
+            }
+        }
+
+        //init actual game
+        reset(app);
     }
 
     public float getDistance() {
@@ -78,7 +113,7 @@ public class RunnerManager {
         }
         runners.clear();
 
-        init(app);
+        reset(app);
     }
 }
 

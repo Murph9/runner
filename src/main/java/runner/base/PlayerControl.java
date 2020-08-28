@@ -9,8 +9,6 @@ import com.jme3.scene.control.AbstractControl;
 
 public class PlayerControl extends AbstractControl implements ActionListener {
 
-    // TODO action startPos.toString() hack is really bad
-
     private final String id;
     private final Vector3f startPos;
     private int pos;

@@ -1,7 +1,7 @@
 package runner.base;
 
 import com.jme3.app.SimpleApplication;
-import com.jme3.app.StatsAppState;
+import com.jme3.app.state.ConstantVerifierState;
 import com.simsilica.lemur.GuiGlobals;
 
 /**@author murph9 */
@@ -19,7 +19,7 @@ public class Main extends SimpleApplication {
     }
     
     public Main() {
-        super(new StatsAppState());
+        super(new ConstantVerifierState()); //we are using this to use the custom constructor
     }
 
     @Override
@@ -34,8 +34,8 @@ public class Main extends SimpleApplication {
         LemurStyle.load(getContext().getSettings());
 
         // init game
-        RunnerManager rm = new RunnerManager(2);
-        rm.init(this);
+        RunnerManager rm = new RunnerManager(3);
+        rm.initOnce(this);
     }
 
     @Override
