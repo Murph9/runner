@@ -33,15 +33,14 @@ public class PlayerControl extends AbstractControl {
     private final ActionListener listener = new ActionListener() {
         @Override
         public void onAction(String name, boolean keyPressed, float tpf) {
-            if (name.equals("Left") && !keyPressed) {
+            if (name.equals("Left") && keyPressed) {
                 pos--;
             }
-            if (name.equals("Right") && !keyPressed) {
+            if (name.equals("Right") && keyPressed) {
                 pos++;
             }
 
             pos = Math.max(-1, Math.min(1, pos)); // clamp
         }
     };
-    
 }

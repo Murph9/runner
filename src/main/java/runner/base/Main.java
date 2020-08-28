@@ -32,7 +32,9 @@ public class Main extends SimpleApplication {
         // initialize Lemur (the GUI manager)
         GuiGlobals.initialize(this);
 
-        RunnerManager.cheapInit(this, 1);
+        // init game
+        RunnerManager rm = new RunnerManager(1);
+        rm.init(this);
     }
 
     @Override
