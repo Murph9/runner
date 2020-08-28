@@ -22,6 +22,7 @@ public class RunnerManager {
     }
 
     private final int count;
+    private RunnerUi ui;
     private List<Runner> runners;
 
     public RunnerManager(int count) {
@@ -30,7 +31,7 @@ public class RunnerManager {
     }
 
     public void init(Application app) {
-        RunnerUi ui = new RunnerUi(this);
+        ui = new RunnerUi(this);
         app.getStateManager().attach(ui);
 
         var cam = app.getCamera();
@@ -38,7 +39,7 @@ public class RunnerManager {
         cam.lookAt(new Vector3f(0, 4, 0), Vector3f.UNIT_Y);
 
         for (int i = 0; i < count; i++) {
-            Runner r = new Runner(this, new Vector3f(i*3, 0, 0), KEY_NAMES.get(i * 2).key, KEY_NAMES.get(i * 2 + 1).key);
+            Runner r = new Runner(this, new Vector3f(i*3f, 0, 0), KEY_NAMES.get(i * 2).key, KEY_NAMES.get(i * 2 + 1).key);
             runners.add(r);
             app.getStateManager().attach(r);
 
@@ -58,13 +59,27 @@ public class RunnerManager {
         for (Runner r: runners) {
             r.setEnabled(false);
         }
+
+        ui.gameOver(getDistance());
     }
 
 	public void start() {
         for (Runner r : runners) {
             r.setEnabled(true);
         }
-	}
+    }
+    
+    public void restart(Application app) {
+        app.getStateManager().detach(ui);
+        ui = null;
+
+        for (Runner r : runners) {
+            app.getStateManager().detach(r);
+        }
+        runners.clear();
+
+        init(app);
+    }
 }
 
 // TODO box generation, probably just comes from a list of patterns

@@ -9,6 +9,7 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.bounding.BoundingVolume;
 import com.jme3.collision.CollisionResults;
+import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.Vector3f;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
@@ -23,17 +24,22 @@ public class Runner extends AbstractAppState {
     // Base instance of a runner game
     private final RunnerManager manager;
     private final Vector3f startPos;
+    private final String playerId;
     private final int leftKey;
     private final int rightKey;
 
     private float distance;
 
+    private SimpleApplication app;
     private final List<Geometry> objects;
     private Geometry player;
+    private Geometry gFloor;
+    
     
     public Runner(RunnerManager manager, Vector3f startPos, int left, int right) {
         this.manager = manager;
         this.startPos = startPos;
+        this.playerId = startPos.toString(); //TODO hack
         this.leftKey = left;
         this.rightKey = right;
         this.objects = new LinkedList<>();
@@ -42,10 +48,11 @@ public class Runner extends AbstractAppState {
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
+        this.app = (SimpleApplication)app;
         Node rootNode = ((SimpleApplication)app).getRootNode();
         
         // floor
-        Geometry gFloor = Geo.createBox(app.getAssetManager(), new Vector3f(2f, 30f, 0.1f), new ColorRGBA(0.2f, 0.2f, 0.2f, 0));
+        gFloor = Geo.createBox(app.getAssetManager(), new Vector3f(2f, 30f, 0.1f), new ColorRGBA(0.2f, 0.2f, 0.2f, 0));
         gFloor.setLocalTranslation(startPos.add(0, 25f, -0.1f));
         rootNode.attachChild(gFloor);
         
@@ -55,9 +62,14 @@ public class Runner extends AbstractAppState {
         player.setName("player");
         player.getMaterial().setColor("Color", H.randomColourHSV());
         player.setLocalTranslation(startPos);
-        player.addControl(new PlayerControl(app, startPos, leftKey, rightKey));
+        player.addControl(new PlayerControl(app, playerId, startPos, leftKey, rightKey));
         rootNode.attachChild(player);
 
+        app.getInputManager().addMapping(playerId + "Left", new KeyTrigger(leftKey));
+        app.getInputManager().addMapping(playerId + "Right", new KeyTrigger(rightKey));
+        app.getInputManager().addListener(player.getControl(PlayerControl.class), playerId + "Left", playerId + "Right");
+
+        //generate boxes, change to be 'dynamic'
         for (int i = 0; i < 10; i++) {
             var g2 = g.clone();
             g2.setName("box" + i);
@@ -108,5 +120,24 @@ public class Runner extends AbstractAppState {
         for (Geometry g: objects) {
             g.getControl(RunnerObjControl.class).setEnabled(false);
         }
+    }
+
+    @Override
+    public void cleanup() {
+        app.getInputManager().deleteMapping(this.playerId + "Left");
+        app.getInputManager().deleteMapping(this.playerId + "Right");
+        app.getInputManager().removeListener(player.getControl(PlayerControl.class));
+
+        player.removeFromParent();
+        player.removeControl(PlayerControl.class);
+
+        gFloor.removeFromParent();
+        
+        for (Geometry g : objects) {
+            g.removeFromParent();
+            g.removeControl(RunnerObjControl.class);
+        }
+
+        super.cleanup();
     }
 }

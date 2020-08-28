@@ -25,29 +25,33 @@ public class RunnerUi extends AbstractAppState {
     
     private Label score;
     private Screen screen;
+    private Application app;
+    private Node rootNode;
 
     public RunnerUi(RunnerManager manager) {
         this.manager = manager;
     }
 
     public void addKeyCombo(String left, String right) {
-        keysList.add(left + " <-- | --> " + right);
+        keysList.add(left + " <    > " + right);
     }
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
+        this.app = app;
         screen = new Screen(app.getContext().getSettings());
-        Node guiNode = ((SimpleApplication)app).getGuiNode();
+        rootNode = new Node("UI node");
+        ((SimpleApplication)app).getGuiNode().attachChild(rootNode);
       
-        initMainWindow(guiNode);
+        initMainWindow(rootNode);
 
-        initScoreWindow(guiNode);
+        initScoreWindow(rootNode);
 
         int count = keysList.size();
         for (int i = 0; i < count; i++) {
             String keys = keysList.get(i);
             Container keyWindow = new Container();
-            guiNode.attachChild(keyWindow);
+            rootNode.attachChild(keyWindow);
             keyWindow.addChild(new Label(keys));
             containers.add(keyWindow);
 
@@ -59,7 +63,7 @@ public class RunnerUi extends AbstractAppState {
     }
 
     @SuppressWarnings("unchecked") // button unchecked vargs
-    private void initMainWindow(Node guiNode) {
+    private void initMainWindow(Node rootNode) {
         Container mainWindow = new Container();
         mainWindow.addChild(new Label("Runner"));
         Button button = mainWindow.addChild(new Button("Go"), 1);
@@ -70,26 +74,56 @@ public class RunnerUi extends AbstractAppState {
                 mainWindow.removeFromParent();
             }
         });
-        guiNode.attachChild(mainWindow);
+        rootNode.attachChild(mainWindow);
 
         screen.centerMe(mainWindow);
     }
 
-    private void initScoreWindow(Node guiNode) {
+    private void initScoreWindow(Node rootNode) {
         Container scoreWindow = new Container();
         score = scoreWindow.addChild(new Label(""));
-        guiNode.attachChild(scoreWindow);
+        rootNode.attachChild(scoreWindow);
         screen.topCenterMe(scoreWindow);
     }
 
     @Override
     public void update(float tpf) {
         if (score != null) {
-            score.setText("Score: " + (int)(manager.getDistance()*10));
+            score.setText(formatScore(manager.getDistance()));
+            screen.topCenterMe((Panel) score.getParent());
         }
 
-        screen.topCenterMe((Panel)score.getParent());
-
         super.update(tpf);
+    }
+
+    private String formatScore(float score) {
+        return ""+(int)(score*10);
+    }
+
+    @SuppressWarnings("unchecked") // button unchecked vargs
+	public void gameOver(float distance) {
+        ((Panel) score.getParent()).removeFromParent();
+
+        Container scoreWindow = new Container();
+        scoreWindow.addChild(new Label("Final score:"));
+        scoreWindow.addChild(new Label(formatScore(manager.getDistance())));
+
+        Button button = scoreWindow.addChild(new Button("Start again"), 1);
+        button.addClickCommands(new Command<Button>() {
+            @Override
+            public void execute(Button source) {
+                manager.restart(app);
+            }
+        });
+
+        rootNode.attachChild(scoreWindow);
+        screen.centerMe(scoreWindow);
+    }
+    
+    @Override
+    public void cleanup() {
+        rootNode.removeFromParent();
+
+        super.cleanup();
     }
 }
