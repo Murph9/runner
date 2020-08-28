@@ -12,7 +12,6 @@ import com.jme3.collision.CollisionResults;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.Vector3f;
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.FastMath;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
@@ -30,6 +29,8 @@ public class Runner extends AbstractAppState {
     private final int rightKey;
     private final Node rootNode;
 
+    private Geometry baseGeo;
+
     private float distance;
 
     private SimpleApplication app;
@@ -37,13 +38,14 @@ public class Runner extends AbstractAppState {
     private final List<Geometry> objects;
     private Geometry player;
     private Geometry gFloor;
-    
+
+    private ObjGenerator generator;
     
     public Runner(RunnerManager manager, Vector3f startPos, int left, int right) {
         this.manager = manager;
         this.rootNode = new Node("root node");
         this.startPos = startPos;
-        this.playerId = startPos.toString(); //TODO hack
+        this.playerId = startPos.toString(); //PLEASE fix this hack for event handlers
         this.leftKey = left;
         this.rightKey = right;
         this.objects = new LinkedList<>();
@@ -52,6 +54,8 @@ public class Runner extends AbstractAppState {
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
+
+        this.baseGeo = Geo.createBox(app.getAssetManager(), new Vector3f(0.4f, 0.4f, 0.1f), ColorRGBA.Black);
         
         this.app = (SimpleApplication)app;
         ((SimpleApplication)app).getRootNode().attachChild(rootNode);
@@ -63,8 +67,7 @@ public class Runner extends AbstractAppState {
         rootNode.attachChild(gFloor);
         
         // player
-        Geometry g = Geo.createBox(app.getAssetManager(), new Vector3f(0.4f, 0.4f, 0.1f), ColorRGBA.Black);
-        player = g.clone();
+        player = baseGeo.clone();
         player.setName("player");
         player.setLocalTranslation(new Vector3f());
         player.getMaterial().setColor("Color", H.randomColourHSV());
@@ -75,15 +78,21 @@ public class Runner extends AbstractAppState {
         app.getInputManager().addMapping(playerId + "Right", new KeyTrigger(rightKey));
         app.getInputManager().addListener(player.getControl(PlayerControl.class), playerId + "Left", playerId + "Right");
 
-        //generate boxes, change to be 'dynamic'
-        for (int i = 0; i < 10; i++) {
-            var g2 = g.clone();
-            g2.setName("box" + i);
-            g2.getMaterial().setColor("Color", H.randomColourHSV());
-            objects.add(g2);
-            g2.setLocalTranslation(FastMath.nextRandomInt(-1, 1), FastMath.nextRandomInt(2, 15)*2, 0);
-            g2.addControl(new RunnerObjControl(new Vector3f(0, -1, 0)));
-            rootNode.attachChild(g2);
+        //start the box generator
+        generator = new ObjGenerator();
+
+        var rows = generator.initalRows();
+        for (int i = 0; i < rows.length; i++) {
+            var row = rows[i];
+            if (row.ifLeft()) {
+                placeBox(-1, i);
+            }
+            if (row.ifRight()) {
+                placeBox(1, i);
+            }
+            if (row.ifMiddle()) {
+                placeBox(0, i);
+            }
         }
 
         setEnabled(false);
@@ -104,6 +113,14 @@ public class Runner extends AbstractAppState {
         return distance;
     }
 
+    private float calcFurthestBox() {
+        float distance = 0;
+        for (Geometry g : objects) {
+            distance = Math.max(distance, g.getLocalTranslation().y);
+        }
+        return distance;
+    }
+
     @Override
     public void update(float tpf) {
         super.update(tpf);
@@ -119,6 +136,39 @@ public class Runner extends AbstractAppState {
                 manager.gameOver();
             }
         }
+        
+        
+        // remove passed boxes
+        for (Geometry g: objects) {
+            if (g.getLocalTranslation().y < -10) {
+                g.removeFromParent();
+            }
+        }
+        
+        // generate new boxes
+        if (calcFurthestBox() < 19) {
+            var row = generator.getNextRow();
+            
+            if (row.ifLeft()) {
+                placeBox(-1, 20);
+            }
+            if (row.ifRight()) {
+                placeBox(1, 20);
+            }
+            if (row.ifMiddle()) {
+                placeBox(0, 20);
+            }
+        }
+    }
+
+    private void placeBox(int xPos, int yPos) {
+        var g2 = baseGeo.clone();
+        g2.setName("box");
+        g2.getMaterial().setColor("Color", H.randomColourHSV());
+        objects.add(g2);
+        g2.setLocalTranslation(xPos, yPos, 0);
+        g2.addControl(new RunnerObjControl(new Vector3f(0, -1, 0)));
+        rootNode.attachChild(g2);
     }
 
     private void stopAllThings() {

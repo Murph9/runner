@@ -117,8 +117,7 @@ public class RunnerManager {
     }
 }
 
-// TODO box generation, probably just comes from a list of patterns
-// everything eventually gets faster
+// TODO everything eventually gets faster
 
 // TODO eventually handle the 12345 + arrows key layout (for jumping and stuff)
 // https://wiki.jmonkeyengine.org/docs/3.3/core/input/combo_moves.html
