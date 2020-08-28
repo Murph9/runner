@@ -67,16 +67,19 @@ public class Runner extends AbstractAppState {
             g2.addControl(new RunnerObjControl(new Vector3f(0, -1, 0)));
             rootNode.attachChild(g2);
         }
+
+        setEnabled(false);
     }
 
     @Override
     public void setEnabled(boolean enabled) {
-        super.setEnabled(enabled);
-
-        player.getControl(PlayerControl.class).setEnabled(enabled);
-        for (Geometry g: this.objects) {
+        if (player != null)
+            player.getControl(PlayerControl.class).setEnabled(enabled);
+        
+        for (Geometry g: this.objects)
             g.getControl(RunnerObjControl.class).setEnabled(enabled);
-        }
+
+        super.setEnabled(enabled);
     }
 
     public float getDistance() {

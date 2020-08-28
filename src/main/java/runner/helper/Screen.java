@@ -94,4 +94,12 @@ public class Screen {
         Vector3f panelSize = c.getPreferredSize();
         c.setLocalTranslation(new Vector3f(pos.x - panelSize.x / 2, pos.y + panelSize.y / 2, pos.z));
     }
+
+    public int getHeight() { 
+        return height;
+    }
+    
+    public int getWidth() {
+        return width;
+    }
 }

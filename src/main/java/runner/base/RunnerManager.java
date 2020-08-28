@@ -30,7 +30,7 @@ public class RunnerManager {
     }
 
     public void init(Application app) {
-        RunnerUi ui = new RunnerUi();
+        RunnerUi ui = new RunnerUi(this);
         app.getStateManager().attach(ui);
 
         var cam = app.getCamera();
@@ -46,11 +46,25 @@ public class RunnerManager {
         }
     }
 
+    public float getDistance() {
+        float distance = 0;
+        for (Runner r: runners) {
+            distance = Math.max(distance, r.getDistance());
+        }
+        return distance;
+    }
+
     public void gameOver() {
         for (Runner r: runners) {
             r.setEnabled(false);
         }
     }
+
+	public void start() {
+        for (Runner r : runners) {
+            r.setEnabled(true);
+        }
+	}
 }
 
 // TODO box generation, probably just comes from a list of patterns
