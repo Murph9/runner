@@ -1,8 +1,8 @@
 package runner.base;
 
-import com.jme3.asset.AssetManager;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
+import com.jme3.system.AppSettings;
 import com.simsilica.lemur.GuiGlobals;
 import com.simsilica.lemur.Insets3f;
 import com.simsilica.lemur.component.QuadBackgroundComponent;
@@ -14,7 +14,9 @@ public class LemurStyle {
     //https://hub.jmonkeyengine.org/t/many-little-lemur-questions/40244/14
     private static final String STYLE_NAME = "my_style";
 
-    public static void load(AssetManager assetManager) {
+    public static void load(AppSettings settings) {
+        int fontSize = Math.min(36, settings.getWidth()/30);
+
         Styles styles = GuiGlobals.getInstance().getStyles();
 
         Attributes attrs;
@@ -33,7 +35,7 @@ public class LemurStyle {
         double_gradient.setColor(new ColorRGBA(0.5f, 0.75f, 0.85f, 0.5f));
 
         attrs = styles.getSelector(STYLE_NAME);
-        attrs.set("fontSize", 16);
+        attrs.set("fontSize", fontSize);
 
         // label
         attrs = styles.getSelector("label", STYLE_NAME);

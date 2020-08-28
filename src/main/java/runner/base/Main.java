@@ -31,7 +31,7 @@ public class Main extends SimpleApplication {
 
         // initialize Lemur (the GUI manager)
         GuiGlobals.initialize(this);
-        LemurStyle.load(assetManager);
+        LemurStyle.load(getContext().getSettings());
 
         // init game
         RunnerManager rm = new RunnerManager(2);
