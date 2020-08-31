@@ -28,6 +28,16 @@ public class RunnerManager {
     private RunnerUi ui;
     private List<Runner> runners;
 
+    protected static float speedByDistance(float dist) {
+        if (dist < 10)
+            return 1;
+        if (dist < 100)
+            return 1 + (dist-10) / 100;
+        if (dist < 200)
+            return 2 + (dist-100) / 50;
+        return 4 + (dist - 200) / 25;
+    }
+
     public RunnerManager(int count) {
         this.count = Math.max(1, count);
         runners = new LinkedList<>();
@@ -116,8 +126,6 @@ public class RunnerManager {
         reset(app);
     }
 }
-
-// TODO everything eventually gets faster
 
 // TODO eventually handle the 12345 + arrows key layout (for jumping and stuff)
 // https://wiki.jmonkeyengine.org/docs/3.3/core/input/combo_moves.html

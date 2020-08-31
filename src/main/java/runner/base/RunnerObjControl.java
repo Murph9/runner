@@ -18,6 +18,10 @@ public class RunnerObjControl extends AbstractControl {
         this.spatial.setLocalTranslation(pos.add(dir.mult(tpf)));
     }
 
+    public void setDir(Vector3f dir) {
+        this.dir.set(dir);
+    }
+
     @Override
     protected void controlRender(RenderManager rm, ViewPort vp) {
         // nothing

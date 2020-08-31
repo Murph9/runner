@@ -32,6 +32,7 @@ public class Runner extends AbstractAppState {
 
     private Geometry baseGeo;
 
+    private float boxSpeed;
     private float distance;
     private int blankRowCount;
 
@@ -51,6 +52,8 @@ public class Runner extends AbstractAppState {
         this.leftKey = left;
         this.rightKey = right;
         this.objects = new LinkedList<>();
+
+        this.boxSpeed = 1;
     }
 
     @Override
@@ -106,14 +109,6 @@ public class Runner extends AbstractAppState {
         return distance;
     }
 
-    private float calcFurthestBox() {
-        float distance = 0;
-        for (Geometry g : objects) {
-            distance = Math.max(distance, g.getLocalTranslation().y);
-        }
-        return distance;
-    }
-
     @Override
     public void update(float tpf) {
         super.update(tpf);
@@ -143,6 +138,36 @@ public class Runner extends AbstractAppState {
             var row = generator.getNextRow();
             placeRow(row, 20);
         }
+
+        //update all speeds
+        boxSpeed = RunnerManager.speedByDistance(getDistance());
+        
+        for (Geometry g : objects) {
+            g.getControl(RunnerObjControl.class).setDir(new Vector3f(0, -boxSpeed, 0));
+        }
+    }
+
+    @Override
+    public void cleanup() {
+        app.getInputManager().deleteMapping(this.playerId + "Left");
+        app.getInputManager().deleteMapping(this.playerId + "Right");
+        app.getInputManager().removeListener(player.getControl(PlayerControl.class));
+
+        player.removeFromParent();
+        player.removeControl(PlayerControl.class);
+
+        gFloor.removeFromParent();
+
+        for (Geometry g : objects) {
+            g.removeFromParent();
+            g.removeControl(RunnerObjControl.class);
+        }
+
+        super.cleanup();
+    }
+
+	public Spatial getRootNode() {
+		return rootNode;
     }
 
     private void placeRow(Pos row, int pos) {
@@ -169,37 +194,23 @@ public class Runner extends AbstractAppState {
         g2.getMaterial().setColor("Color", H.randomColourHSV());
         objects.add(g2);
         g2.setLocalTranslation(xPos, yPos, 0);
-        g2.addControl(new RunnerObjControl(new Vector3f(0, -1, 0)));
+        g2.addControl(new RunnerObjControl(new Vector3f(0, -boxSpeed, 0)));
         rootNode.attachChild(g2);
     }
 
     private void stopAllThings() {
         player.getControl(PlayerControl.class).setEnabled(false);
-        for (Geometry g: objects) {
+        for (Geometry g : objects) {
             g.getControl(RunnerObjControl.class).setEnabled(false);
         }
     }
-
-    @Override
-    public void cleanup() {
-        app.getInputManager().deleteMapping(this.playerId + "Left");
-        app.getInputManager().deleteMapping(this.playerId + "Right");
-        app.getInputManager().removeListener(player.getControl(PlayerControl.class));
-
-        player.removeFromParent();
-        player.removeControl(PlayerControl.class);
-
-        gFloor.removeFromParent();
-
+    
+    private float calcFurthestBox() {
+        float distance = 0;
         for (Geometry g : objects) {
-            g.removeFromParent();
-            g.removeControl(RunnerObjControl.class);
+            distance = Math.max(distance, g.getLocalTranslation().y);
         }
-
-        super.cleanup();
+        return distance;
     }
 
-	public Spatial getRootNode() {
-		return rootNode;
-	}
 }

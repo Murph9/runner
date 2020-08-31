@@ -45,17 +45,33 @@ public class ObjGenerator {
     }
 
     enum Pattern {
-        Nothing(Pos.None, Pos.None, Pos.None),
-        BasicL(Pos.None, Pos.None, Pos.Left),
-        BasicM(Pos.None, Pos.None, Pos.Middle),
-        BasicR(Pos.None, Pos.None, Pos.Right),
+        Nothing(0, Pos.None, Pos.None, Pos.None),
+        BasicL(1, Pos.None, Pos.None, Pos.Left),
+        BasicM(1, Pos.None, Pos.None, Pos.Middle),
+        BasicR(1, Pos.None, Pos.None, Pos.Right),
+        LR(2, Pos.None, Pos.Left, Pos.Right, Pos.Middle),
+        RL(2, Pos.None, Pos.Right, Pos.Left, Pos.Middle),
+
+        Outside(2, Pos.None, Pos.LeftRight, Pos.LeftRight),
+
+        LeftBlock(5, Pos.None, Pos.None, Pos.LeftMiddle, Pos.None, Pos.None, Pos.Right),
+        RightBlock(5, Pos.None, Pos.None, Pos.MiddleRight, Pos.None, Pos.None, Pos.Left),
+
+        LeftBlock2(10, Pos.None, Pos.None, Pos.LeftMiddle, Pos.None, Pos.Right),
+        RightBlock2(10, Pos.None, Pos.None, Pos.MiddleRight, Pos.None, Pos.Left),
         ;
 
-        private Pos[] pos;
-        Pattern(Pos... pos) {
+        private final int score;
+        private final Pos[] pos;
+        Pattern(int score, Pos... pos) {
+            this.score = score;
             this.pos = pos;
         }
 
+        public int getScore() {
+            return score;
+        }
+        
         public Pos[] get() {
             return pos;
         }
