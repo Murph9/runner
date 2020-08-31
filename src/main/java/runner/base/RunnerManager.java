@@ -16,10 +16,10 @@ public class RunnerManager {
     static {
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_A, "A"));
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_D, "D"));
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_J, "J"));
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_K, "K"));
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_LEFT, "<-"));
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_RIGHT, "->"));
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_J, "J"));
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_K, "K"));
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_1, "1"));
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_2, "2"));
     }

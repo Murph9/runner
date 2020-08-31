@@ -34,7 +34,7 @@ public class Main extends SimpleApplication {
         LemurStyle.load(getContext().getSettings());
 
         // init game
-        RunnerManager rm = new RunnerManager(3);
+        RunnerManager rm = new RunnerManager(2);
         rm.initOnce(this);
     }
 
