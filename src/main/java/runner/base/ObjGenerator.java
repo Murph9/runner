@@ -1,5 +1,12 @@
 package runner.base;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+
+import com.jme3.math.FastMath;
+
 public class ObjGenerator {
 
     public enum Pos {
@@ -31,6 +38,10 @@ public class ObjGenerator {
         public boolean ifRight() {
             return right;
         }
+
+        public boolean ifEmpty() {
+            return !left && !middle && !right;
+        }
     }
 
     enum Pattern {
@@ -50,13 +61,41 @@ public class ObjGenerator {
         }
     }
 
+
+    private final Queue<Pos> buffer;
+    public ObjGenerator() {
+        buffer = new LinkedList<>();
+    }
+
     public Pos getNextRow() {
-        // TODO random
-        return Pattern.BasicL.get()[2];
+        if (buffer.isEmpty()) {
+            appendPattern(rand(Pattern.values()));
+        }
+        
+        return buffer.poll();
     }
 
 	public Pos[] initalRows() {
-        // TODO random
-		return new Pos[] { Pos.None, Pos.None, Pos.None, Pos.None, Pos.Left, Pos.Right };
-	}
+        // random easy
+        var patternList = new Pattern[] { Pattern.BasicL, Pattern.BasicM, Pattern.BasicR};
+        List<Pos> pos = new LinkedList<>();
+        pos.add(Pos.None);
+        pos.add(Pos.None);
+        while (pos.size() < 20) {
+            pos.addAll(Arrays.asList(rand(patternList).pos));
+        }
+        
+		return pos.toArray(new Pos[pos.size()]);
+    }
+    
+    private void appendPattern(Pattern pattern) {
+        appendPos(pattern.pos);
+    }
+    private void appendPos(Pos ...pos) {
+        buffer.addAll(Arrays.asList(pos));
+    }
+
+    private static <T> T rand(T[] list) {
+        return list[FastMath.nextRandomInt(0, list.length -1 )];
+    }
 }

@@ -16,6 +16,7 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
+import runner.base.ObjGenerator.Pos;
 import runner.helper.Geo;
 import runner.helper.H;
 
@@ -32,6 +33,7 @@ public class Runner extends AbstractAppState {
     private Geometry baseGeo;
 
     private float distance;
+    private int blankRowCount;
 
     private SimpleApplication app;
     
@@ -83,16 +85,7 @@ public class Runner extends AbstractAppState {
 
         var rows = generator.initalRows();
         for (int i = 0; i < rows.length; i++) {
-            var row = rows[i];
-            if (row.ifLeft()) {
-                placeBox(-1, i);
-            }
-            if (row.ifRight()) {
-                placeBox(1, i);
-            }
-            if (row.ifMiddle()) {
-                placeBox(0, i);
-            }
+            placeRow(rows[i], i);
         }
 
         setEnabled(false);
@@ -146,18 +139,27 @@ public class Runner extends AbstractAppState {
         }
         
         // generate new boxes
-        if (calcFurthestBox() < 19) {
+        if (calcFurthestBox() + blankRowCount < 19) {
             var row = generator.getNextRow();
-            
-            if (row.ifLeft()) {
-                placeBox(-1, 20);
-            }
-            if (row.ifRight()) {
-                placeBox(1, 20);
-            }
-            if (row.ifMiddle()) {
-                placeBox(0, 20);
-            }
+            placeRow(row, 20);
+        }
+    }
+
+    private void placeRow(Pos row, int pos) {
+        if (row.ifLeft()) {
+            placeBox(-1, pos);
+        }
+        if (row.ifRight()) {
+            placeBox(1, pos);
+        }
+        if (row.ifMiddle()) {
+            placeBox(0, pos);
+        }
+
+        if (row.ifEmpty()) {
+            blankRowCount++;
+        } else {
+            blankRowCount = 0;
         }
     }
 
