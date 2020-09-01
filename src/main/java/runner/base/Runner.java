@@ -1,8 +1,5 @@
 package runner.base;
 
-import java.util.LinkedList;
-import java.util.List;
-
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
@@ -16,7 +13,8 @@ import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
-import runner.base.ObjGenerator.Pos;
+import runner.generator.ObjGenerator;
+import runner.generator.Pattern;
 import runner.helper.Geo;
 import runner.helper.H;
 
@@ -30,15 +28,11 @@ public class Runner extends AbstractAppState {
     private final int rightKey;
     private final Node rootNode;
 
-    private Geometry baseGeo;
-
-    private float boxSpeed;
-    private float distance;
-    private int blankRowCount;
-
     private SimpleApplication app;
     
-    private final List<Geometry> objects;
+    private final BoxMover mover;
+    private float placedDistance;
+    
     private Geometry player;
     private Geometry gFloor;
 
@@ -51,17 +45,16 @@ public class Runner extends AbstractAppState {
         this.playerId = startPos.toString(); //PLEASE fix this hack for event handlers
         this.leftKey = left;
         this.rightKey = right;
-        this.objects = new LinkedList<>();
 
-        this.boxSpeed = 1;
+        this.mover = new BoxMover();
     }
 
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         super.initialize(stateManager, app);
 
-        this.baseGeo = Geo.createBox(app.getAssetManager(), new Vector3f(0.4f, 0.4f, 0.1f), ColorRGBA.Black);
-        
+        this.mover.setSpeed(1);
+
         this.app = (SimpleApplication)app;
         ((SimpleApplication)app).getRootNode().attachChild(rootNode);
         rootNode.setLocalTranslation(startPos);
@@ -72,7 +65,7 @@ public class Runner extends AbstractAppState {
         rootNode.attachChild(gFloor);
         
         // player
-        player = baseGeo.clone();
+        player = Geo.createBox(app.getAssetManager(), new Vector3f(0.4f, 0.4f, 0.1f), ColorRGBA.Black);
         player.setName("player");
         player.setLocalTranslation(new Vector3f());
         player.getMaterial().setColor("Color", H.randomColourHSV());
@@ -85,11 +78,7 @@ public class Runner extends AbstractAppState {
 
         //start the box generator
         generator = new ObjGenerator();
-
-        var rows = generator.initalRows();
-        for (int i = 0; i < rows.length; i++) {
-            placeRow(rows[i], i);
-        }
+        placePattern(generator.getStart(25), 5);
 
         setEnabled(false);
     }
@@ -98,52 +87,37 @@ public class Runner extends AbstractAppState {
     public void setEnabled(boolean enabled) {
         if (player != null)
             player.getControl(PlayerControl.class).setEnabled(enabled);
-        
-        for (Geometry g: this.objects)
-            g.getControl(RunnerObjControl.class).setEnabled(enabled);
 
+        mover.setEnabled(enabled);
         super.setEnabled(enabled);
     }
 
     public float getDistance() {
-        return distance;
+        return mover.getDistance();
     }
 
     @Override
     public void update(float tpf) {
         super.update(tpf);
 
-        distance += tpf;
+        // update all speeds
+        float distance = mover.getDistance();
+        mover.setSpeed(RunnerManager.speedByDistance(distance));
+        mover.update(tpf);
 
         //check for collisions
         CollisionResults results = new CollisionResults();
         BoundingVolume box = player.getWorldBound();
-        for (Geometry g: objects) {
+        for (Geometry g: mover.getBoxes()) {
             if (g.collideWith(box, results) > 0) {
                 stopAllThings();
                 manager.gameOver();
             }
         }
-        
-        
-        // remove passed boxes
-        for (Geometry g: objects) {
-            if (g.getLocalTranslation().y < -10) {
-                g.removeFromParent();
-            }
-        }
-        
+                
         // generate new boxes
-        if (calcFurthestBox() + blankRowCount < 19) {
-            var row = generator.getNextRow();
-            placeRow(row, 20);
-        }
-
-        //update all speeds
-        boxSpeed = RunnerManager.speedByDistance(getDistance());
-        
-        for (Geometry g : objects) {
-            g.getControl(RunnerObjControl.class).setDir(new Vector3f(0, -boxSpeed, 0));
+        if (placedDistance < distance + 20) {
+            placePattern(generator.getNext(), 20);
         }
     }
 
@@ -158,11 +132,7 @@ public class Runner extends AbstractAppState {
 
         gFloor.removeFromParent();
 
-        for (Geometry g : objects) {
-            g.removeFromParent();
-            g.removeControl(RunnerObjControl.class);
-        }
-
+        mover.cleanup();
         super.cleanup();
     }
 
@@ -170,47 +140,16 @@ public class Runner extends AbstractAppState {
 		return rootNode;
     }
 
-    private void placeRow(Pos row, int pos) {
-        if (row.ifLeft()) {
-            placeBox(-1, pos);
+    private void placePattern(Pattern pattern, float yPos) {
+        placedDistance += pattern.getLength();
+        
+        for (var b: pattern.boxes) {
+            rootNode.attachChild(mover.placeBox(app, b.length, b.xPos.pos, yPos + b.yPos));
         }
-        if (row.ifRight()) {
-            placeBox(1, pos);
-        }
-        if (row.ifMiddle()) {
-            placeBox(0, pos);
-        }
-
-        if (row.ifEmpty()) {
-            blankRowCount++;
-        } else {
-            blankRowCount = 0;
-        }
-    }
-
-    private void placeBox(int xPos, int yPos) {
-        var g2 = baseGeo.clone();
-        g2.setName("box");
-        g2.getMaterial().setColor("Color", H.randomColourHSV());
-        objects.add(g2);
-        g2.setLocalTranslation(xPos, yPos, 0);
-        g2.addControl(new RunnerObjControl(new Vector3f(0, -boxSpeed, 0)));
-        rootNode.attachChild(g2);
     }
 
     private void stopAllThings() {
         player.getControl(PlayerControl.class).setEnabled(false);
-        for (Geometry g : objects) {
-            g.getControl(RunnerObjControl.class).setEnabled(false);
-        }
+        mover.stopAll();
     }
-    
-    private float calcFurthestBox() {
-        float distance = 0;
-        for (Geometry g : objects) {
-            distance = Math.max(distance, g.getLocalTranslation().y);
-        }
-        return distance;
-    }
-
 }
