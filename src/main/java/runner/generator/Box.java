@@ -2,6 +2,7 @@ package runner.generator;
 
 public class Box {
     public static final float BASIC_LENGTH = 0.2f;
+    public static final float LONG_LENGTH = 2;
 
     public final Pos xPos;
     public final float yPos;

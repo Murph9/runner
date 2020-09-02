@@ -146,6 +146,8 @@ public class Runner extends AbstractAppState {
         for (var b: pattern.boxes) {
             rootNode.attachChild(mover.placeBox(app, b.length, b.xPos.pos, yPos + b.yPos));
         }
+
+        rootNode.attachChild(mover.placeLine(app, yPos+pattern.getLength(), -1.5f, 1.5f));
     }
 
     private void stopAllThings() {
