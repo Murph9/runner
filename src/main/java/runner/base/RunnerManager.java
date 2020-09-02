@@ -7,6 +7,7 @@ import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.ViewPort;
 
@@ -16,12 +17,30 @@ public class RunnerManager {
     static {
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_A, "A"));
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_D, "D"));
+
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_LEFT, "<-"));
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_RIGHT, "->"));
+
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_J, "J"));
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_K, "K"));
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_L, "L"));
+
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_V, "V"));
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_N, "N"));
+
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_F, "F"));
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_H, "H"));
+
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_1, "1"));
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_2, "2"));
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_3, "3"));
+
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_5, "5"));
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_7, "7"));
+
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_0, "0"));
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_EQUALS, "="));
+
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_NUMPAD4, "Num4"));
+        KEY_NAMES.add(new KeyMap(KeyInput.KEY_NUMPAD6, "Num6"));
     }
 
     private static final float SPEED_MULT = 1.75f;
@@ -40,7 +59,7 @@ public class RunnerManager {
     }
 
     public RunnerManager(int count) {
-        this.count = Math.max(1, count);
+        this.count = (int)FastMath.clamp(count, 1, KEY_NAMES.size()/2); //can't make more than your key combos
         runners = new LinkedList<>();
     }
 

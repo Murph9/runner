@@ -33,7 +33,7 @@ public class RunnerUi extends AbstractAppState {
     }
 
     public void addKeyCombo(String left, String right) {
-        keysList.add(left + " <    > " + right);
+        keysList.add(left + "   |   " + right);
     }
 
     @Override
