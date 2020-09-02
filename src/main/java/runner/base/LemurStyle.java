@@ -1,6 +1,8 @@
 package runner.base;
 
+import com.jme3.font.BitmapFont;
 import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
 import com.jme3.system.AppSettings;
 import com.simsilica.lemur.GuiGlobals;
 import com.simsilica.lemur.Insets3f;
@@ -17,14 +19,14 @@ public class LemurStyle {
         final ColorRGBA base = new ColorRGBA(1, 0.455f, 0.439f, 1f); // FF7470
         final ColorRGBA base2 = new ColorRGBA(1, 0.831f, 0.643f, 1f); // FFD4A4
 
-        int fontSize = Math.min(36, settings.getWidth()/30);
-
         Styles styles = GuiGlobals.getInstance().getStyles();
 
+        int fontSize = (int)FastMath.clamp(settings.getWidth() / 15, 36, 130);
+        BitmapFont font = GuiGlobals.getInstance().loadFont("Interface/Fonts/nasalization.fnt");
+        styles.setDefault(font);
+
         Attributes attrs;
-
         QuadBackgroundComponent bg = new QuadBackgroundComponent(new ColorRGBA(0f, 0f, 0f, 1f));
-
         TbtQuadBackgroundComponent gradient = TbtQuadBackgroundComponent.create(
                 "Textures/solid-white.png",
                 1, 1, 1, 2, 2,
