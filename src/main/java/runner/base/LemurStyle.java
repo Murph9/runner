@@ -13,7 +13,7 @@ import com.simsilica.lemur.style.Styles;
 
 public class LemurStyle {
     //https://hub.jmonkeyengine.org/t/many-little-lemur-questions/40244/14
-    private static final String STYLE_NAME = "my_style";
+    public static final String STYLE_NAME = "my_style";
 
     public static void load(AppSettings settings) {
         final ColorRGBA base = new ColorRGBA(1, 0.455f, 0.439f, 1f); // FF7470
@@ -39,6 +39,12 @@ public class LemurStyle {
         attrs = styles.getSelector("label", STYLE_NAME);
         attrs.set("insets", new Insets3f(2, 2, 0, 2));
         attrs.set("color", base2);
+
+        // title
+        attrs = styles.getSelector("title", STYLE_NAME);
+        attrs.set("insets", new Insets3f(2, 2, 0, 2));
+        attrs.set("color", base2);
+        attrs.set("fontSize", fontSize * 1.5f);
 
         // button
         attrs = styles.getSelector("button", STYLE_NAME);

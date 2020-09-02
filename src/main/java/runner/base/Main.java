@@ -1,6 +1,7 @@
 package runner.base;
 
 import com.jme3.app.SimpleApplication;
+import com.jme3.app.StatsAppState;
 import com.jme3.app.state.ConstantVerifierState;
 import com.simsilica.lemur.GuiGlobals;
 
@@ -15,12 +16,12 @@ public class Main extends SimpleApplication {
         System.out.println("Program isdebug: " + IS_DEBUG);
         
         Main main = new Main();
-        main.setDisplayStatView(true); // defaults to on, shows the triangle count and stuff
+        main.setDisplayStatView(IS_DEBUG); // shows the triangle count and stuff
         main.start();
     }
     
     public Main() {
-        super(new ConstantVerifierState()); //we are using this to use the custom constructor
+        super(new ConstantVerifierState(), new StatsAppState()); //we are using this to use the custom constructor
     }
 
     @Override

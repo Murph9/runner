@@ -16,6 +16,7 @@ import com.simsilica.lemur.HAlignment;
 import com.simsilica.lemur.Label;
 import com.simsilica.lemur.Panel;
 import com.simsilica.lemur.VAlignment;
+import com.simsilica.lemur.style.ElementId;
 
 import runner.helper.Screen;
 
@@ -87,7 +88,7 @@ public class RunnerUi extends AbstractAppState {
 
     private void initScoreWindow(Node rootNode) {
         Container scoreWindow = new Container();
-        score = scoreWindow.addChild(new Label(""));
+        score = scoreWindow.addChild(new Label("", new ElementId("title")));
         rootNode.attachChild(scoreWindow);
         screen.topCenterMe(scoreWindow);
     }
@@ -103,7 +104,7 @@ public class RunnerUi extends AbstractAppState {
     }
 
     private String formatScore(float score) {
-        return ""+(int)(score*10);
+        return ""+(int)score;
     }
 
     @SuppressWarnings("unchecked") // button unchecked vargs
