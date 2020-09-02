@@ -11,6 +11,8 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.ViewPort;
 
+import runner.saving.RecordManager;
+
 public class RunnerManager {
     //to handle their viewports
     private static final List<KeyMap> KEY_NAMES = new LinkedList<>();
@@ -68,7 +70,9 @@ public class RunnerManager {
     }
 
     private void reset(Application app) {
-        ui = new RunnerUi(this);
+        var highScore = RecordManager.getRecord(this.count);
+
+        ui = new RunnerUi(this, highScore);
         app.getStateManager().attach(ui);
 
         for (int i = 0; i < count; i++) {
@@ -125,7 +129,9 @@ public class RunnerManager {
             r.setEnabled(false);
         }
 
-        ui.gameOver(getDistance());
+        float score = getDistance();
+        RecordManager.saveRecord(this.count, score);
+        ui.gameOver(score);
     }
 
 	public void start() {

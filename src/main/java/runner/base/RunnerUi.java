@@ -25,14 +25,16 @@ public class RunnerUi extends AbstractAppState {
     private final RunnerManager manager;
     private final List<String> keysList = new LinkedList<>();
     private final List<Container> containers = new LinkedList<>();
-    
+    private final float highScore;
+
     private Label score;
     private Screen screen;
     private Application app;
     private Node rootNode;
 
-    public RunnerUi(RunnerManager manager) {
+    public RunnerUi(RunnerManager manager, float highScore) {
         this.manager = manager;
+        this.highScore = highScore;
     }
 
     public void addKeyCombo(String left, String right) {
@@ -88,7 +90,12 @@ public class RunnerUi extends AbstractAppState {
 
     private void initScoreWindow(Node rootNode) {
         Container scoreWindow = new Container();
+        var highScore = scoreWindow.addChild(new Label(formatScore(this.highScore), new ElementId("small")));
+        highScore.setTextHAlignment(HAlignment.Center);
+
         score = scoreWindow.addChild(new Label("", new ElementId("title")));
+        score.setTextHAlignment(HAlignment.Center);
+        
         rootNode.attachChild(scoreWindow);
         screen.topCenterMe(scoreWindow);
     }

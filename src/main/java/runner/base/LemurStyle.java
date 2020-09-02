@@ -46,6 +46,12 @@ public class LemurStyle {
         attrs.set("color", base2);
         attrs.set("fontSize", fontSize * 1.5f);
 
+        // small
+        attrs = styles.getSelector("small", STYLE_NAME);
+        attrs.set("insets", new Insets3f(2, 2, 0, 2));
+        attrs.set("color", base2);
+        attrs.set("fontSize", fontSize / 1.5f);
+
         // button
         attrs = styles.getSelector("button", STYLE_NAME);
         attrs.set("color", base2);
