@@ -28,13 +28,14 @@ public class Pattern {
     }
 
     public float getLength() {
-        if (length != 0)
+        if (length > 0)
             return length; // if set use it
 
         float max = 0;
         for (Box b : this.boxes) {
             max = Math.max(max, b.yPos + b.length);
         }
+        
         return FastMath.ceil(max);
     }
 

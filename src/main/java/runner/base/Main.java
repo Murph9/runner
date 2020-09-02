@@ -8,10 +8,11 @@ import com.simsilica.lemur.GuiGlobals;
 public class Main extends SimpleApplication {
 
     public static final String PROJECT_VERSION = "v0.0.1 (2020-08-27)";
+    public static boolean IS_DEBUG = true;
 
     public static void main( String... args ) {
-        boolean isDebug = java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments().toString().contains("-agentlib:jdwp");
-        System.out.println("Program isdebug: " + isDebug);
+        IS_DEBUG = java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments().toString().contains("-agentlib:jdwp");
+        System.out.println("Program isdebug: " + IS_DEBUG);
         
         Main main = new Main();
         main.setDisplayStatView(true); // defaults to on, shows the triangle count and stuff
@@ -34,7 +35,7 @@ public class Main extends SimpleApplication {
         LemurStyle.load(getContext().getSettings());
 
         // init game
-        RunnerManager rm = new RunnerManager(2);
+        RunnerManager rm = new RunnerManager(2); //TODO count in menu
         rm.initOnce(this);
     }
 
