@@ -59,7 +59,7 @@ public class BoxMover {
     }
 
     public Geometry placeBox(Application app, float yLength, int xPos, float yPos) {
-        Geometry g2 = Geo.createBox(app.getAssetManager(), new Vector3f(0.4f, yLength, 0.1f), ColorRGBA.Black);
+        Geometry g2 = Geo.createBox(app.getAssetManager(), new Vector3f(0.4f, yLength/2, 0.1f), ColorRGBA.Black);
         g2.getMaterial().setColor("Color", H.randomColourHSV());
         boxes.add(g2);
         g2.setLocalTranslation(xPos, yPos, 0);
