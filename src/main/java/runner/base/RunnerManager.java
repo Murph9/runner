@@ -24,18 +24,19 @@ public class RunnerManager {
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_2, "2"));
     }
 
+    private static final float SPEED_MULT = 1.75f;
     private final int count;
     private RunnerUi ui;
     private List<Runner> runners;
 
     protected static float speedByDistance(float dist) {
-        if (dist < 10)
-            return 1;
+        if (dist < 0)
+            return SPEED_MULT;
         if (dist < 100)
-            return 1 + (dist-10) / 100;
+            return SPEED_MULT + (dist) / 50 / SPEED_MULT;
         if (dist < 200)
-            return 2 + (dist-100) / 50;
-        return 4 + (dist - 200) / 25;
+            return 3 * SPEED_MULT + (dist - 100) / 100 / SPEED_MULT;
+        return 4 * SPEED_MULT + (dist - 200) / 200 / SPEED_MULT;
     }
 
     public RunnerManager(int count) {
