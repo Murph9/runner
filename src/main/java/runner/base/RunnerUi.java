@@ -12,8 +12,10 @@ import com.jme3.scene.Node;
 import com.simsilica.lemur.Button;
 import com.simsilica.lemur.Command;
 import com.simsilica.lemur.Container;
+import com.simsilica.lemur.HAlignment;
 import com.simsilica.lemur.Label;
 import com.simsilica.lemur.Panel;
+import com.simsilica.lemur.VAlignment;
 
 import runner.helper.Screen;
 
@@ -55,8 +57,7 @@ public class RunnerUi extends AbstractAppState {
             keyWindow.addChild(new Label(keys));
             containers.add(keyWindow);
 
-            screen.centeredAt(keyWindow, new Vector3f(i* screen.getWidth() / count + screen.getWidth() / (2 * count), 
-                    screen.getHeight() - 50, 0));
+            screen.centeredAt(keyWindow, new Vector3f(i * screen.getWidth() / count + screen.getWidth() / (2 * count), 50, 0));
         }
 
         super.initialize(stateManager, app);
@@ -65,8 +66,13 @@ public class RunnerUi extends AbstractAppState {
     @SuppressWarnings("unchecked") // button unchecked vargs
     private void initMainWindow(Node rootNode) {
         Container mainWindow = new Container();
-        mainWindow.addChild(new Label("Runner"));
-        Button button = mainWindow.addChild(new Button("Go"), 1);
+        mainWindow.setPreferredSize(new Vector3f(screen.getWidth()/3, screen.getHeight()/3, 0));
+        var l = mainWindow.addChild(new Label("Runner"));
+        l.setTextHAlignment(HAlignment.Center);
+        l.setTextVAlignment(VAlignment.Center);
+        Button button = mainWindow.addChild(new Button("Go"));
+        button.setTextHAlignment(HAlignment.Center);
+        button.setTextVAlignment(VAlignment.Center);
         button.addClickCommands(new Command<Button>() {
             @Override
             public void execute(Button source) {
@@ -105,10 +111,17 @@ public class RunnerUi extends AbstractAppState {
         ((Panel) score.getParent()).removeFromParent();
 
         Container scoreWindow = new Container();
-        scoreWindow.addChild(new Label("Final score:"));
-        scoreWindow.addChild(new Label(formatScore(manager.getDistance())));
+        scoreWindow.setPreferredSize(new Vector3f(screen.getWidth() / 3, screen.getHeight() / 3, 0));
+        var l = scoreWindow.addChild(new Label("Game over"));
+        l.setTextHAlignment(HAlignment.Center);
+        l.setTextVAlignment(VAlignment.Center);
+        l = scoreWindow.addChild(new Label(formatScore(manager.getDistance())));
+        l.setTextHAlignment(HAlignment.Center);
+        l.setTextVAlignment(VAlignment.Center);
 
-        Button button = scoreWindow.addChild(new Button("Start again"), 1);
+        Button button = scoreWindow.addChild(new Button("Start again"));
+        button.setTextHAlignment(HAlignment.Center);
+        button.setTextVAlignment(VAlignment.Center);
         button.addClickCommands(new Command<Button>() {
             @Override
             public void execute(Button source) {

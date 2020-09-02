@@ -1,7 +1,6 @@
 package runner.base;
 
 import com.jme3.math.ColorRGBA;
-import com.jme3.math.Vector3f;
 import com.jme3.system.AppSettings;
 import com.simsilica.lemur.GuiGlobals;
 import com.simsilica.lemur.Insets3f;
@@ -15,24 +14,21 @@ public class LemurStyle {
     private static final String STYLE_NAME = "my_style";
 
     public static void load(AppSettings settings) {
+        final ColorRGBA base = new ColorRGBA(1, 0.455f, 0.439f, 1f); // FF7470
+        final ColorRGBA base2 = new ColorRGBA(1, 0.831f, 0.643f, 1f); // FFD4A4
+
         int fontSize = Math.min(36, settings.getWidth()/30);
 
         Styles styles = GuiGlobals.getInstance().getStyles();
 
         Attributes attrs;
 
-        QuadBackgroundComponent bg = new QuadBackgroundComponent(new ColorRGBA(0.207f, 0.207f, 0.207f, 0.85f));
+        QuadBackgroundComponent bg = new QuadBackgroundComponent(new ColorRGBA(0f, 0f, 0f, 1f));
 
         TbtQuadBackgroundComponent gradient = TbtQuadBackgroundComponent.create(
                 "Textures/solid-white.png",
                 1, 1, 1, 2, 2,
-                1f,false);
-                
-        TbtQuadBackgroundComponent double_gradient = TbtQuadBackgroundComponent.create(
-                "Textures/double-gradient-128.png",
-                1, 1, 1, 126, 126,
-                1f,false);
-        double_gradient.setColor(new ColorRGBA(0.5f, 0.75f, 0.85f, 0.5f));
+                1f, false);
 
         attrs = styles.getSelector(STYLE_NAME);
         attrs.set("fontSize", fontSize);
@@ -40,28 +36,21 @@ public class LemurStyle {
         // label
         attrs = styles.getSelector("label", STYLE_NAME);
         attrs.set("insets", new Insets3f(2, 2, 0, 2));
-        attrs.set("color", new ColorRGBA(0, 0, 0, 0.85f));
-
-        // title
-        attrs = styles.getSelector("title", STYLE_NAME);
-        attrs.set("color", new ColorRGBA(0.8f, 0.9f, 1.0f, 0.85f));
-        attrs.set("highlightColor", new ColorRGBA(1.0f, 0.8f, 1.0f, 0.85f));
-        attrs.set("shadowColor", new ColorRGBA(0.0f, 0.0f, 0.0f, 0.75f));
-        attrs.set("shadowOffset", new Vector3f(2, -2, -1));
-        attrs.set("background", double_gradient.clone());
-        attrs.set("insets", new Insets3f(2, 2, 2, 2));
+        attrs.set("color", base2);
 
         // button
         attrs = styles.getSelector("button", STYLE_NAME);
-        attrs.set("color", new ColorRGBA(0.8f, 0.9f, 1.0f, 0.85f));
+        attrs.set("color", base2);
         attrs.set("background", gradient.clone());
-        ((TbtQuadBackgroundComponent)attrs.get("background")).setColor(new ColorRGBA(0.5f, 0.6f, 0.8f, 0.5f));
+        ((TbtQuadBackgroundComponent)attrs.get("background")).setColor(new ColorRGBA(1,1,1,0.2f));
         attrs.set("insets", new Insets3f(2, 2, 2, 2));
+        attrs.set("highlightColor", base);
+        attrs.set("focusColor", base);
 
         // container
         attrs = styles.getSelector("container", STYLE_NAME);
         attrs.set("background", gradient.clone());
-        ((TbtQuadBackgroundComponent)attrs.get("background")).setColor(new ColorRGBA(1f, 1f, 1, 0.7f));
+        ((TbtQuadBackgroundComponent)attrs.get("background")).setColor(new ColorRGBA(1f, 1f, 1f, 0f));
 
         // slider
         attrs = styles.getSelector("slider", STYLE_NAME);
