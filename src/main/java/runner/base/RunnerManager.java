@@ -53,13 +53,16 @@ public class RunnerManager {
     private List<Runner> runners;
 
     protected static float speedByDistance(float dist) {
+        return SPEED_MULT * _speedByDistance(dist);
+    }
+    private static float _speedByDistance(float dist) {
         if (dist < 0)
-            return SPEED_MULT;
+            return 1;
         if (dist < 100)
-            return SPEED_MULT + (dist) / 50 / SPEED_MULT;
+            return 1 + (dist) / 50;
         if (dist < 200)
-            return 3 * SPEED_MULT + (dist - 100) / 100 / SPEED_MULT;
-        return 4 * SPEED_MULT + (dist - 200) / 200 / SPEED_MULT;
+            return 3 + (dist - 100) / 100;
+        return 4 + (dist - 200) / 200;
     }
 
     public RunnerManager(int count) {
