@@ -15,6 +15,7 @@ import com.simsilica.lemur.VAlignment;
 import com.simsilica.lemur.style.ElementId;
 
 import runner.helper.Screen;
+import runner.saving.RecordManager;
 
 public class MainMenu extends AbstractAppState {
     
@@ -40,13 +41,13 @@ public class MainMenu extends AbstractAppState {
     @SuppressWarnings("unchecked") // button unchecked vargs
     private void initMainWindow(Node rootNode) {
         mainWindow = new Container();
-        mainWindow.setPreferredSize(new Vector3f(screen.getWidth() / 2, screen.getHeight() / 2, 0));
+        mainWindow.setPreferredSize(new Vector3f(screen.getWidth() / 2, screen.getHeight() / 1.4f, 0));
         var l = mainWindow.addChild(new Label("Runner", new ElementId("title")));
         l.setTextHAlignment(HAlignment.Center);
         l.setTextVAlignment(VAlignment.Center);
 
         for (int i = 1; i < 6; i++) {
-            Button button = mainWindow.addChild(new Button("Go (" + i + ")"));
+            Button button = mainWindow.addChild(new Button("Start (" + i + ")"));
             button.setTextHAlignment(HAlignment.Center);
             button.setTextVAlignment(VAlignment.Center);
             final int count = i;
@@ -57,6 +58,9 @@ public class MainMenu extends AbstractAppState {
                     startup(count);
                 }
             });
+
+            l = mainWindow.addChild(new Label("HS: " + (int)RecordManager.getRecord(i), new ElementId("small")), 1);
+            l.setTextVAlignment(VAlignment.Center);
         }
         rootNode.attachChild(mainWindow);
 
