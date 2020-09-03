@@ -9,7 +9,9 @@ import com.jme3.input.KeyInput;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
+import com.jme3.post.FilterPostProcessor;
 import com.jme3.renderer.ViewPort;
+import com.jme3.post.filters.FogFilter;
 
 import runner.saving.RecordManager;
 
@@ -88,6 +90,10 @@ public class RunnerManager {
 
     public void initOnce(Application app) {
         // setup viewports
+        var fpp = new FilterPostProcessor(app.getAssetManager());
+        FogFilter fog = new FogFilter(new ColorRGBA(0f, 0f, 0f, .5f), 2f, 80f);
+        fpp.addFilter(fog);
+        app.getViewPort().addProcessor(fpp);
 
         // do 1 first, as its the default one
         var offset = calcOffsetFor(0);
@@ -109,6 +115,10 @@ public class RunnerManager {
                 view_n.attachScene(((SimpleApplication)app).getRootNode());
                 view_n.setBackgroundColor(ColorRGBA.Black);
                 view_n.setClearFlags(true, true, true);
+
+                fpp = new FilterPostProcessor(app.getAssetManager());
+                fpp.addFilter(fog);
+                view_n.addProcessor(fpp);
             }
         }
 

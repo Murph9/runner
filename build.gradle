@@ -62,6 +62,7 @@ dependencies {
 	implementation "org.jmonkeyengine:jme3-core:${jme3Version}"
 	implementation "org.jmonkeyengine:jme3-desktop:${jme3Version}"
 	implementation "org.jmonkeyengine:jme3-lwjgl:${jme3Version}"
+    implementation "org.jmonkeyengine:jme3-effects:${jme3Version}"
 	
     implementation "org.yaml:snakeyaml:1.25"
     implementation "com.simsilica:lemur:1.13.0"
