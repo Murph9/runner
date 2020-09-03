@@ -137,6 +137,16 @@ public class RunnerUi extends AbstractAppState {
             }
         });
 
+        button = scoreWindow.addChild(new Button("Main Menu"));
+        button.setTextHAlignment(HAlignment.Center);
+        button.setTextVAlignment(VAlignment.Center);
+        button.addClickCommands(new Command<Button>() {
+            @Override
+            public void execute(Button source) {
+                manager.stop(app);
+            }
+        });
+
         rootNode.attachChild(scoreWindow);
         screen.centerMe(scoreWindow);
     }

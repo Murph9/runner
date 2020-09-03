@@ -21,7 +21,9 @@ public class Main extends SimpleApplication {
     }
     
     public Main() {
-        super(new ConstantVerifierState(), new StatsAppState()); //we are using this to use the custom constructor
+        super(new ConstantVerifierState(),
+                new StatsAppState(),
+                new MainMenu());
     }
 
     @Override
@@ -34,10 +36,6 @@ public class Main extends SimpleApplication {
         // initialize Lemur (the GUI manager)
         GuiGlobals.initialize(this);
         LemurStyle.load(getContext().getSettings());
-
-        // init game
-        RunnerManager rm = new RunnerManager(2); //TODO count in menu
-        rm.initOnce(this);
     }
 
     @Override
