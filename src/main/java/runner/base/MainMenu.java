@@ -4,7 +4,6 @@ import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
-import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.simsilica.lemur.Button;
 import com.simsilica.lemur.Command;
@@ -46,7 +45,6 @@ public class MainMenu extends AbstractAppState {
     private void initMainWindow(Node rootNode) {
 
         mainWindow = new Container();
-        mainWindow.setPreferredSize(new Vector3f(screen.getWidth() / 2, screen.getHeight() / 1.4f, 0));
         var l = mainWindow.addChild(new Label("Runner", new ElementId("title")));
         l.setTextHAlignment(HAlignment.Center);
         l.setTextVAlignment(VAlignment.Center);
