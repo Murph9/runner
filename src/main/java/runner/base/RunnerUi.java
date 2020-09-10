@@ -37,8 +37,8 @@ public class RunnerUi extends AbstractAppState {
         this.highScore = highScore;
     }
 
-    public void addKeyCombo(String left, String right) {
-        keysList.add(left + "   |   " + right);
+    public void addKeyCombo(String text) {
+        keysList.add(text);
     }
 
     @Override

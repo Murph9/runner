@@ -6,13 +6,14 @@ import com.jme3.app.state.AbstractAppState;
 import com.jme3.app.state.AppStateManager;
 import com.jme3.bounding.BoundingVolume;
 import com.jme3.collision.CollisionResults;
-import com.jme3.input.controls.KeyTrigger;
 import com.jme3.math.Vector3f;
 import com.jme3.math.ColorRGBA;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
+import runner.control.IControlScheme;
+import runner.control.PlayerControl;
 import runner.generator.ObjGenerator;
 import runner.generator.Pattern;
 import runner.helper.Geo;
@@ -23,9 +24,8 @@ public class Runner extends AbstractAppState {
     // Base instance of a runner game
     private final RunnerManager manager;
     private final Vector3f startPos;
-    private final String playerId;
-    private final int leftKey;
-    private final int rightKey;
+    private final int num;
+    private final IControlScheme control;
     private final Node rootNode;
 
     private SimpleApplication app;
@@ -38,14 +38,12 @@ public class Runner extends AbstractAppState {
 
     private ObjGenerator generator;
     
-    public Runner(RunnerManager manager, Vector3f startPos, int left, int right) {
+    public Runner(RunnerManager manager, int num, Vector3f startPos, IControlScheme control) {
         this.manager = manager;
+        this.num = num;
         this.rootNode = new Node("root node");
         this.startPos = startPos;
-        this.playerId = startPos.toString(); //PLEASE fix this hack for event handlers
-        this.leftKey = left;
-        this.rightKey = right;
-
+        this.control = control;
         this.mover = new BoxMover();
     }
 
@@ -69,12 +67,10 @@ public class Runner extends AbstractAppState {
         player.setName("player");
         player.setLocalTranslation(new Vector3f());
         player.getMaterial().setColor("Color", H.randomColourHSV());
-        player.addControl(new PlayerControl(app, playerId, new Vector3f(), leftKey, rightKey));
+        player.addControl(new PlayerControl(app, num, new Vector3f(), control));
         rootNode.attachChild(player);
 
-        app.getInputManager().addMapping(playerId + "Left", new KeyTrigger(leftKey));
-        app.getInputManager().addMapping(playerId + "Right", new KeyTrigger(rightKey));
-        app.getInputManager().addListener(player.getControl(PlayerControl.class), playerId + "Left", playerId + "Right");
+        control.listenFor(app.getInputManager(), num, player.getControl(PlayerControl.class));
 
         //start the box generator
         generator = new ObjGenerator();
@@ -123,9 +119,7 @@ public class Runner extends AbstractAppState {
 
     @Override
     public void cleanup() {
-        app.getInputManager().deleteMapping(this.playerId + "Left");
-        app.getInputManager().deleteMapping(this.playerId + "Right");
-        app.getInputManager().removeListener(player.getControl(PlayerControl.class));
+        control.deListenFor(app.getInputManager(), num, player.getControl(PlayerControl.class));
 
         player.removeFromParent();
         player.removeControl(PlayerControl.class);
@@ -148,6 +142,7 @@ public class Runner extends AbstractAppState {
         }
 
         //rootNode.attachChild(mover.placeLine(app, yPos, -1.5f, 1.5f));
+        //TODO fix starting pattern not having the correct length
     }
 
     private void stopAllThings() {

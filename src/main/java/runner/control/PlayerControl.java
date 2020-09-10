@@ -1,4 +1,4 @@
-package runner.base;
+package runner.control;
 
 import com.jme3.app.Application;
 import com.jme3.input.controls.ActionListener;
@@ -9,13 +9,15 @@ import com.jme3.scene.control.AbstractControl;
 
 public class PlayerControl extends AbstractControl implements ActionListener {
 
-    private final String id;
+    private final int num;
     private final Vector3f startPos;
+    private final IControlScheme control;
     private int pos;
 
-    public PlayerControl(Application app, String id, Vector3f startPos, int keyRight, int keyLeft) {
+    public PlayerControl(Application app, int num, Vector3f startPos, IControlScheme control) {
         this.startPos = startPos;
-        this.id = id;
+        this.num = num;
+        this.control = control;
     }
 
     @Override
@@ -30,10 +32,11 @@ public class PlayerControl extends AbstractControl implements ActionListener {
 
     @Override
     public void onAction(String name, boolean keyPressed, float tpf) {
-        if (name.equals(PlayerControl.this.id + "Left") && keyPressed) {
+        var result = control.onAction(num, name, keyPressed, tpf);
+        if (result == MoveDir.Left) {
             pos--;
         }
-        if (name.equals(PlayerControl.this.id + "Right") && keyPressed) {
+        if (result == MoveDir.Right) {
             pos++;
         }
 

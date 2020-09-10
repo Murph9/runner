@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
-import com.jme3.input.KeyInput;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
 import com.jme3.math.Vector3f;
@@ -14,45 +13,18 @@ import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 import com.jme3.post.filters.FogFilter;
 
+import runner.control.ControlScheme;
+import runner.control.IControlScheme;
 import runner.saving.RecordManager;
 
 public class RunnerManager {
-    //to handle their viewports
-    private static final List<KeyMap> KEY_NAMES = new LinkedList<>();
-    static {
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_A, "A"));
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_D, "D"));
-
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_LEFT, "<-"));
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_RIGHT, "->"));
-
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_J, "J"));
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_L, "L"));
-
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_V, "V"));
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_N, "N"));
-
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_F, "F"));
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_H, "H"));
-
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_1, "1"));
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_3, "3"));
-
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_5, "5"));
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_7, "7"));
-
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_0, "0"));
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_EQUALS, "="));
-
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_NUMPAD4, "Num4"));
-        KEY_NAMES.add(new KeyMap(KeyInput.KEY_NUMPAD6, "Num6"));
-    }
-
+    
     private static final float SPEED_MULT = 1.75f;
     private final MainMenu menu;
     private final int count;
     private RunnerUi ui;
     private List<Runner> runners;
+    private IControlScheme controller;
 
     protected static float speedByDistance(float dist) {
         return SPEED_MULT * _speedByDistance(dist);
@@ -69,8 +41,9 @@ public class RunnerManager {
 
     public RunnerManager(MainMenu menu, int count) {
         this.menu = menu;
-        this.count = (int)FastMath.clamp(count, 1, KEY_NAMES.size()/2); //can't make more than your key combos
-        runners = new LinkedList<>();
+        this.controller = new ControlScheme();
+        this.count = (int)FastMath.clamp(count, 1, controller.maxCount()); //can't make more than your key combos
+        this.runners = new LinkedList<>();
     }
 
     private Vector3f calcOffsetFor(int i) {
@@ -86,11 +59,11 @@ public class RunnerManager {
         for (int i = 0; i < count; i++) {
             Vector3f offset = calcOffsetFor(i);
 
-            Runner r = new Runner(this, offset, KEY_NAMES.get(i * 2).key, KEY_NAMES.get(i * 2 + 1).key);
+            Runner r = new Runner(this, i, offset, controller);
             runners.add(r);
             app.getStateManager().attach(r);
 
-            ui.addKeyCombo(KEY_NAMES.get(i * 2).text, KEY_NAMES.get(i * 2 + 1).text);
+            ui.addKeyCombo(controller.getControlsFor(i));
         }
     }
 
@@ -121,7 +94,6 @@ public class RunnerManager {
             view_n.addProcessor(fpp);
         }
     
-
         //init actual game
         reset(app);
     }
@@ -183,17 +155,5 @@ public class RunnerManager {
             else
                 app.getRenderManager().removeMainView(viewport);
         }
-    }
-}
-
-// TODO eventually handle the 12345 + arrows key layout (for jumping and stuff)
-// https://wiki.jmonkeyengine.org/docs/3.3/core/input/combo_moves.html
-
-class KeyMap {
-    public final int key;
-    public final String text;
-    public KeyMap(int key, String text) {
-        this.key = key;
-        this.text = text;
     }
 }

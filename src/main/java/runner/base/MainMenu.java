@@ -78,5 +78,7 @@ public class MainMenu extends AbstractAppState {
 
     public void quit() {
         rootNode.attachChild(mainWindow);
+
+        //TODO reload highscores
     }
 }
