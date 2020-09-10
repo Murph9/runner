@@ -13,12 +13,15 @@ import com.jme3.renderer.Camera;
 import com.jme3.renderer.ViewPort;
 import com.jme3.post.filters.FogFilter;
 
-import runner.control.ControlScheme;
+import runner.control.PairControlScheme;
 import runner.control.IControlScheme;
 import runner.saving.RecordManager;
 
 public class RunnerManager {
     
+    public static final String PAIR_CONTROLS = "pair";
+    public static final String NUM_CONTROLS = "num";
+
     private static final float SPEED_MULT = 1.75f;
     private final MainMenu menu;
     private final int count;
@@ -39,11 +42,16 @@ public class RunnerManager {
         return 4 + (dist - 200) / 200;
     }
 
-    public RunnerManager(MainMenu menu, int count) {
+    public RunnerManager(MainMenu menu, int count, String type) {
         this.menu = menu;
-        this.controller = new ControlScheme();
-        this.count = (int)FastMath.clamp(count, 1, controller.maxCount()); //can't make more than your key combos
         this.runners = new LinkedList<>();
+
+        if (type == PAIR_CONTROLS)
+            this.controller = new PairControlScheme();
+        else
+            throw new IllegalArgumentException("type");
+
+        this.count = (int)FastMath.clamp(count, 1, controller.maxCount()); //can't make more than your key combos
     }
 
     private Vector3f calcOffsetFor(int i) {

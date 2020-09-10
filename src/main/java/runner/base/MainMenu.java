@@ -72,7 +72,7 @@ public class MainMenu extends AbstractAppState {
             rm.cleanup(app);
 
         // init game
-        rm = new RunnerManager(this, count);
+        rm = new RunnerManager(this, count, RunnerManager.PAIR_CONTROLS);
         rm.initOnce(app);
     }
 

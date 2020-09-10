@@ -13,6 +13,7 @@ import com.jme3.scene.Node;
 import com.jme3.scene.Spatial;
 
 import runner.control.IControlScheme;
+import runner.control.IControlSchemeListener;
 import runner.control.PlayerControl;
 import runner.generator.ObjGenerator;
 import runner.generator.Pattern;
@@ -67,10 +68,10 @@ public class Runner extends AbstractAppState {
         player.setName("player");
         player.setLocalTranslation(new Vector3f());
         player.getMaterial().setColor("Color", H.randomColourHSV());
-        player.addControl(new PlayerControl(app, num, new Vector3f(), control));
+        player.addControl(new PlayerControl(app, new Vector3f()));
         rootNode.attachChild(player);
 
-        control.listenFor(app.getInputManager(), num, player.getControl(PlayerControl.class));
+        control.addControl(app.getInputManager(), num, (IControlSchemeListener)player.getControl(PlayerControl.class));
 
         //start the box generator
         generator = new ObjGenerator();
@@ -119,7 +120,7 @@ public class Runner extends AbstractAppState {
 
     @Override
     public void cleanup() {
-        control.deListenFor(app.getInputManager(), num, player.getControl(PlayerControl.class));
+        control.removeControl(app.getInputManager(), num);
 
         player.removeFromParent();
         player.removeControl(PlayerControl.class);

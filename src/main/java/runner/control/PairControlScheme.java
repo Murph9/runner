@@ -1,30 +1,39 @@
 package runner.control;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.jme3.input.InputManager;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.KeyTrigger;
 
-public class ControlScheme implements IControlScheme {
+public class PairControlScheme implements IControlScheme {
     
-    public int maxCount() {
-        return KEY_NAMES.size() / 2;
+    private Map<Integer, IControlSchemeListener> listeners = new HashMap<>();
+
+    @Override
+    public void init(InputManager im) {
+        im.addListener(this);
     }
 
-    public void listenFor(InputManager im, int runnerNum, PlayerControl control) {
+    @Override
+    public void addControl(InputManager im, int runnerNum, IControlSchemeListener controlListener) {
+        listeners.put(runnerNum, controlListener);
+
         var keys = getForNum(runnerNum);
         im.addMapping(runnerNum + "_Left", new KeyTrigger(keys[0].key));
         im.addMapping(runnerNum + "_Right", new KeyTrigger(keys[1].key));
-        im.addListener(control, runnerNum + "_Left", runnerNum + "_Right");
+        im.addListener(this, runnerNum + "_Left", runnerNum + "_Right");
+    }
+
+    @Override
+    public int maxCount() {
+        return KEY_NAMES.size() / 2;
     }
     
-    public void deListenFor(InputManager im, int runnerNum, PlayerControl control) {
-        im.deleteMapping(runnerNum + "_Left");
-        im.deleteMapping(runnerNum + "_Right");
-        im.removeListener(control);
-    }
     private KeyMap[] getForNum(int runnerNum) {
         return new KeyMap[] {KEY_NAMES.get(runnerNum * 2), KEY_NAMES.get(runnerNum * 2 + 1)};
     }
@@ -33,16 +42,6 @@ public class ControlScheme implements IControlScheme {
         return a[0].text + "   |   " + a[1].text;
     }
     
-    public MoveDir onAction(int runnerNum, String name, boolean keyPressed, float tpf) {
-        if (name.equals(runnerNum+"_Left") && keyPressed)
-            return MoveDir.Left;
-        if (name.equals(runnerNum + "_Right") && keyPressed)
-            return MoveDir.Right;
-
-        return MoveDir.None;
-    }
-
-
     // to handle their viewports
     public static final List<KeyMap> KEY_NAMES = new LinkedList<>();
     static {
@@ -73,17 +72,31 @@ public class ControlScheme implements IControlScheme {
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_NUMPAD4, "Num4"));
         KEY_NAMES.add(new KeyMap(KeyInput.KEY_NUMPAD6, "Num6"));
     }
-}
 
-// TODO eventually handle the 12345 + arrows key layout (for jumping and stuff)
-// https://wiki.jmonkeyengine.org/docs/3.3/core/input/combo_moves.html
+    private static final Pattern REGEX = Pattern.compile("(\\d)_(.+)");
+    @Override
+    public void onAction(String name, boolean isPressed, float tpf) {
+        var result = REGEX.matcher(name);
+        if (!result.matches() || result.groupCount() < 2)
+            return;
+        int num = Integer.parseInt(result.group(1));
+        String action = result.group(2);
 
-class KeyMap {
-    public final int key;
-    public final String text;
+        if (action.equals("Left") && isPressed)
+            callListener(num, MoveDir.Left);
+        if (action.equals("Right") && isPressed)
+            callListener(num, MoveDir.Right);
+    }
 
-    public KeyMap(int key, String text) {
-        this.key = key;
-        this.text = text;
+    private void callListener(int num, MoveDir dir) {
+        listeners.get(num).doMove(dir);
+    }
+
+    @Override
+    public void removeControl(InputManager im, int num) {
+        listeners.remove(num);
+
+        im.deleteMapping(num + "_Left");
+        im.deleteMapping(num + "_Right");
     }
 }

@@ -1,13 +1,13 @@
 package runner.control;
 
 import com.jme3.input.InputManager;
+import com.jme3.input.controls.ActionListener;
 
-public interface IControlScheme {
+public interface IControlScheme extends ActionListener {
+    void init(InputManager app);
+    void addControl(InputManager app, int num, IControlSchemeListener controlListener);
+    void removeControl(InputManager app, int num);
+
     int maxCount();
-
-    void listenFor(InputManager im, int runnerNum, PlayerControl control);
-    void deListenFor(InputManager im, int runnerNum, PlayerControl control);
-    
-    MoveDir onAction(int runnerNum, String name, boolean keyPressed, float tpf);
     String getControlsFor(int runnerNum);
 }
