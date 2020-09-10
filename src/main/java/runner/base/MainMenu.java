@@ -9,6 +9,7 @@ import com.jme3.scene.Node;
 import com.simsilica.lemur.Button;
 import com.simsilica.lemur.Command;
 import com.simsilica.lemur.Container;
+import com.simsilica.lemur.GuiGlobals;
 import com.simsilica.lemur.HAlignment;
 import com.simsilica.lemur.Label;
 import com.simsilica.lemur.VAlignment;
@@ -26,11 +27,14 @@ public class MainMenu extends AbstractAppState {
     private Container mainWindow;
     private RunnerManager rm;
 
+    private String controlMode;
+
     @Override
     public void initialize(AppStateManager stateManager, Application app) {
         this.app = app;
-        screen = new Screen(app.getContext().getSettings());
-        rootNode = new Node("UI node");
+        this.screen = new Screen(app.getContext().getSettings());
+        this.controlMode = RunnerManager.PAIR_CONTROLS;
+        this.rootNode = new Node("UI node");
         ((SimpleApplication)app).getGuiNode().attachChild(rootNode);
       
         initMainWindow(rootNode);
@@ -40,6 +44,7 @@ public class MainMenu extends AbstractAppState {
 
     @SuppressWarnings("unchecked") // button unchecked vargs
     private void initMainWindow(Node rootNode) {
+
         mainWindow = new Container();
         mainWindow.setPreferredSize(new Vector3f(screen.getWidth() / 2, screen.getHeight() / 1.4f, 0));
         var l = mainWindow.addChild(new Label("Runner", new ElementId("title")));
@@ -62,8 +67,35 @@ public class MainMenu extends AbstractAppState {
             l = mainWindow.addChild(new Label("HS: " + (int)RecordManager.getRecord(i), new ElementId("small")), 1);
             l.setTextVAlignment(VAlignment.Center);
         }
-        rootNode.attachChild(mainWindow);
+        
+        // add control options
+        var popup = GuiGlobals.getInstance().getPopupState();
+        var l2 = mainWindow.addChild(new Button("Control scheme: " + this.controlMode));
+        l2.addClickCommands(new Command<Button>() {
+            @Override
+            public void execute(Button source) {
+                Container c = new Container();
+                var pairB = c.addChild(new Button(RunnerManager.PAIR_CONTROLS));
+                var numB = c.addChild(new Button(RunnerManager.NUM_CONTROLS));
 
+                var command = new Command<Button>() {
+                    @Override
+                    public void execute(Button source) {
+                        MainMenu.this.controlMode = source.getText();
+                        l2.setText("Control scheme: " + MainMenu.this.controlMode);
+                        popup.closePopup(c);
+                    }
+                };
+
+                pairB.addClickCommands(command);
+                numB.addClickCommands(command);
+
+                screen.centerMe(c);
+                popup.showPopup(c);
+            }
+        });
+        
+        rootNode.attachChild(mainWindow);
         screen.centerMe(mainWindow);
     }
 
@@ -72,7 +104,7 @@ public class MainMenu extends AbstractAppState {
             rm.cleanup(app);
 
         // init game
-        rm = new RunnerManager(this, count, RunnerManager.PAIR_CONTROLS);
+        rm = new RunnerManager(this, count, controlMode);
         rm.initOnce(app);
     }
 

@@ -12,11 +12,15 @@ import com.jme3.input.controls.KeyTrigger;
 
 public class PairControlScheme implements IControlScheme {
     
-    private Map<Integer, IControlSchemeListener> listeners = new HashMap<>();
+    private final Map<Integer, IControlSchemeListener> listeners = new HashMap<>();
 
     @Override
     public void init(InputManager im) {
         im.addListener(this);
+    }
+    @Override
+    public void remove(InputManager im) {
+        im.removeListener(this);
     }
 
     @Override

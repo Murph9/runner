@@ -15,12 +15,13 @@ import com.jme3.post.filters.FogFilter;
 
 import runner.control.PairControlScheme;
 import runner.control.IControlScheme;
+import runner.control.NumControlScheme;
 import runner.saving.RecordManager;
 
 public class RunnerManager {
     
-    public static final String PAIR_CONTROLS = "pair";
-    public static final String NUM_CONTROLS = "num";
+    public static final String PAIR_CONTROLS = "Pair";
+    public static final String NUM_CONTROLS = "Num";
 
     private static final float SPEED_MULT = 1.75f;
     private final MainMenu menu;
@@ -48,14 +49,16 @@ public class RunnerManager {
 
         if (type == PAIR_CONTROLS)
             this.controller = new PairControlScheme();
+        else if (type == NUM_CONTROLS)
+            this.controller = new NumControlScheme();
         else
             throw new IllegalArgumentException("type");
 
-        this.count = (int)FastMath.clamp(count, 1, controller.maxCount()); //can't make more than your key combos
+        this.count = (int) FastMath.clamp(count, 1, controller.maxCount()); // can't make more than your key combos
     }
 
     private Vector3f calcOffsetFor(int i) {
-        return new Vector3f(i*10f, 0, 0); //just far enough that they can't see each other
+        return new Vector3f(i * 10f, 0, 0); // just far enough that they can't see each other
     }
 
     private void reset(Application app) {
@@ -102,6 +105,8 @@ public class RunnerManager {
             view_n.addProcessor(fpp);
         }
     
+        this.controller.init(app.getInputManager());
+
         //init actual game
         reset(app);
     }
@@ -151,6 +156,7 @@ public class RunnerManager {
         }
         runners.clear();
 
+        controller.remove(app.getInputManager());
         menu.quit();
     }
 
