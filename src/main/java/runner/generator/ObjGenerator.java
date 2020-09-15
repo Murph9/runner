@@ -26,7 +26,7 @@ public class ObjGenerator {
     private static final Pattern LongM = new Pattern(2, 0, new Box(Pos.Middle, 2, Box.LONG_LENGTH));
     private static final Pattern LongR = new Pattern(2, 0, new Box(Pos.Right, 2, Box.LONG_LENGTH));
 
-    private static final Pattern[] ALL_PATTERNS  = new Pattern[] { Nothing,
+    private static final Pattern[] ALL_PATTERNS = new Pattern[] { Nothing,
         BasicL, BasicM, BasicR,
         LR, RL,
         LeftBlock, RightBlock,

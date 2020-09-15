@@ -75,6 +75,7 @@ public class Runner extends AbstractAppState {
 
         //start the box generator
         generator = new ObjGenerator();
+        placedDistance += 5; //add offset to prevent starting overlap
         placePattern(generator.getStart(25), 5);
 
         setEnabled(false);
@@ -143,7 +144,6 @@ public class Runner extends AbstractAppState {
         }
 
         //rootNode.attachChild(mover.placeLine(app, yPos, -1.5f, 1.5f));
-        //TODO fix starting pattern not having the correct length
     }
 
     private void stopAllThings() {
