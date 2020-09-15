@@ -14,6 +14,8 @@ public class NumControlScheme implements IControlScheme {
     private final Map<Integer, IControlSchemeListener> listeners = new HashMap<>();
     private int currentNum;
 
+    // https://wiki.jmonkeyengine.org/docs/3.3/core/input/combo_moves.html
+
     public NumControlScheme() {
         currentNum = 0;
     }
@@ -89,6 +91,3 @@ public class NumControlScheme implements IControlScheme {
         im.deleteMapping(runnerNum + "");
     }
 }
-
-// TODO eventually handle the 12345 + arrows key layout (for jumping and stuff)
-// https://wiki.jmonkeyengine.org/docs/3.3/core/input/combo_moves.html
