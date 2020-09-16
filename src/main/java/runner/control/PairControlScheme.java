@@ -13,10 +13,18 @@ import com.jme3.input.controls.KeyTrigger;
 public class PairControlScheme implements IControlScheme {
     
     private final Map<Integer, IControlSchemeListener> listeners = new HashMap<>();
+    private boolean enabled;
+
+    @Override
+    public void setEnabled(boolean value) {
+        this.enabled = value;
+    }
 
     @Override
     public void init(InputManager im) {
         im.addListener(this);
+
+        setEnabled(true);
     }
     @Override
     public void remove(InputManager im) {
@@ -80,6 +88,9 @@ public class PairControlScheme implements IControlScheme {
     private static final Pattern REGEX = Pattern.compile("(\\d)_(.+)");
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
+        if (!enabled)
+            return;
+
         var result = REGEX.matcher(name);
         if (!result.matches() || result.groupCount() < 2)
             return;

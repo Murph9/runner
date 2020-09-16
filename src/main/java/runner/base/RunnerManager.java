@@ -14,11 +14,12 @@ import com.jme3.renderer.ViewPort;
 import com.jme3.post.filters.FogFilter;
 
 import runner.control.PairControlScheme;
+import runner.base.PauseState.ICallback;
 import runner.control.IControlScheme;
 import runner.control.NumControlScheme;
 import runner.saving.RecordManager;
 
-public class RunnerManager {
+public class RunnerManager implements ICallback {
     
     public static final String PAIR_CONTROLS = "Pair";
     public static final String NUM_CONTROLS = "Num";
@@ -79,6 +80,8 @@ public class RunnerManager {
     }
 
     public void initOnce(Application app) {
+        app.getStateManager().attach(new PauseState(this));
+
         // setup viewports
         FogFilter fog = new FogFilter(new ColorRGBA(0f, 0f, 0f, .5f), 2f, 80f);
         var cam = app.getCamera();
@@ -120,6 +123,7 @@ public class RunnerManager {
     }
 
     public void gameOver() {
+        controller.setEnabled(false);
         for (Runner r: runners) {
             r.setEnabled(false);
         }
@@ -161,7 +165,7 @@ public class RunnerManager {
     }
 
     public void cleanup(Application app) {
-        //remove all but the first one
+        // remove all but the first one
         boolean first = true;
         for (var viewport: new LinkedList<>(app.getRenderManager().getMainViews())) {
             if (first)
@@ -169,5 +173,21 @@ public class RunnerManager {
             else
                 app.getRenderManager().removeMainView(viewport);
         }
+
+        var pauseState = app.getStateManager().getState(PauseState.class);
+        app.getStateManager().detach(pauseState);
+    }
+
+    @Override
+    public void pauseState(boolean value) {
+        for (Runner r : runners) {
+            r.setEnabled(value);
+        }
+        controller.setEnabled(value);
+    }
+
+    @Override
+    public void quit() {
+        gameOver();
     }
 }

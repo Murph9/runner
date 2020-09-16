@@ -13,6 +13,7 @@ public class NumControlScheme implements IControlScheme {
     
     private final Map<Integer, IControlSchemeListener> listeners = new HashMap<>();
     private int currentNum;
+    private boolean enabled;
 
     // https://wiki.jmonkeyengine.org/docs/3.3/core/input/combo_moves.html
 
@@ -21,10 +22,17 @@ public class NumControlScheme implements IControlScheme {
     }
 
     @Override
+    public void setEnabled(boolean value) {
+        this.enabled = value;
+    }
+
+    @Override
     public void init(InputManager im) {
         im.addMapping("Left", new KeyTrigger(KeyInput.KEY_LEFT));
         im.addMapping("Right", new KeyTrigger(KeyInput.KEY_RIGHT));
         im.addListener(this, "Left", "Right");
+
+        setEnabled(true);
     }
 
     @Override
@@ -61,6 +69,9 @@ public class NumControlScheme implements IControlScheme {
 
     @Override
     public void onAction(String name, boolean isPressed, float tpf) {
+        if (!enabled)
+            return;
+
         if (!isPressed)
             return;
 

@@ -12,4 +12,6 @@ public interface IControlScheme extends ActionListener {
 
     int maxCount();
     String getControlsFor(int runnerNum);
+
+    void setEnabled(boolean value);
 }
