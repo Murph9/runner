@@ -33,16 +33,19 @@ public class MainMenu extends AbstractAppState {
         this.app = app;
         this.screen = new Screen(app.getContext().getSettings());
         this.controlMode = RunnerManager.PAIR_CONTROLS;
-        this.rootNode = new Node("UI node");
-        ((SimpleApplication)app).getGuiNode().attachChild(rootNode);
-      
-        initMainWindow(rootNode);
+        
+        initMainWindow();
 
         super.initialize(stateManager, app);
     }
 
     @SuppressWarnings("unchecked") // button unchecked vargs
-    private void initMainWindow(Node rootNode) {
+    private void initMainWindow() {
+        if (this.rootNode != null)
+            this.rootNode.removeFromParent();
+        
+        this.rootNode = new Node("UI node");
+        ((SimpleApplication) app).getGuiNode().attachChild(rootNode);
 
         mainWindow = new Container();
         var l = mainWindow.addChild(new Label("Runner", new ElementId("title")));
@@ -107,8 +110,6 @@ public class MainMenu extends AbstractAppState {
     }
 
     public void quit() {
-        rootNode.attachChild(mainWindow);
-
-        //TODO reload highscores
+        initMainWindow();
     }
 }
