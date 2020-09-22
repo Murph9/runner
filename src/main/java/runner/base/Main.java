@@ -8,10 +8,10 @@ import com.simsilica.lemur.GuiGlobals;
 /**@author murph9 */
 public class Main extends SimpleApplication {
 
-    public static final String PROJECT_VERSION = "v0.0.1 (2020-08-27)";
+    public static final String PROJECT_VERSION = "v0.0.2 (2020-09-22)";
     public static boolean IS_DEBUG = true;
 
-    public static void main( String... args ) {
+    public static void main(String... args) {
         IS_DEBUG = java.lang.management.ManagementFactory.getRuntimeMXBean().getInputArguments().toString().contains("-agentlib:jdwp");
         System.out.println("Program isdebug: " + IS_DEBUG);
         
